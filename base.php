@@ -20,7 +20,6 @@ if(!defined("ENVIRONMENT")) {
 		}
 	} else {
 		define("ENVIRONMENT", "DEV");
-		define("PID", 16);
 	}
 }
 

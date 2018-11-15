@@ -96,3 +96,87 @@ $project = new \Project(PID);
 $eid = (int) $project->firstEventId;
 
 ($name == "zip" ? "pat_zip" : $name)
+
+
+
+
+
+# process imported data so that $baselineData and $pdcData will be ready to save
+
+for ($i = 1; $i < count($imported); $i++){
+	$line = str_getcsv($imported[$i]);
+	if ($line[1] == 'pdc_measurement') {
+		// record_id
+		$pdcData .= "\r\n" . $line[0] . ",";
+		// redcap_repeat_instrument
+		$pdcData .= $line[1] . ",";
+		// redcap_repeat_instance
+		$pdcData .= $line[2] . ",";
+		// last_fill_date
+		$pdcData .= (new DateTime($line[18]))->format("Y-m-d") . ",";
+		// measure_date
+		$pdcData .= (new DateTime($line[19]))->format("Y-m-d") . ",";
+		// gap_days
+		$pdcData .= $line[20] . ",";
+		// pdc_measurement_4mths
+		$pdcData .= $line[21] . ",";
+		// pdc_measurement_12mths
+		$pdcData .= $line[22];
+	} else {
+		// record_id
+		$baselineData .= "\r\n" . $line[0] . ",";
+		// import_date
+		$baselineData .= (new DateTime($line[3]))->format("Y-m-d") . ",";
+		// mrn_gpi
+		$baselineData .= $line[4] . ",";
+		// sex
+		$baselineData .= $line[5] . ",";
+		// date_birth
+		$baselineData .= (new DateTime($line[6]))->format("Y-m-d") . ",";
+		// age
+		$baselineData .= $line[7] . ",";
+		// insurance
+		$baselineData .= $line[8] . ",";
+		// oop
+		$baselineData .= $line[9] . ",";
+		// zip
+		$baselineData .= $line[10] . ",";
+		// med_name
+		$baselineData .= $line[11] . ",";
+		// clinic
+		$baselineData .= $line[12] . ",";
+		// clinic_level
+		$baselineData .= $line[13] . ",";
+		// vsp_pat
+		$baselineData .= $line[14] . ",";
+		// inclusion_pdc
+		$baselineData .= $line[17];
+	}
+}
+
+
+
+# output/record variables
+$baselineData = "record_id,import_date,mrn_gpi,sex,date_birth,age,insurance,oop,zip,med_name,clinic,clinic_level";		# pat_zip => zip
+$pdcData = "record_id,redcap_repeat_instrument,redcap_repeat_instance,last_fill_date,measure_date,gap_days,pdc_measurement_4mths,pdc_measurement_12mths";
+$baselineHeaders = str_getcsv($baselineData);
+$pdcHeaders = str_getcsv($pdcData);
+
+
+
+
+# test get
+// $testData = \REDCap::getData(PID, 'csv');
+// echo gettype($testData) . "<br \>";
+// echo "<pre>" . print_r($testData, true) . "</pre>";
+// exit;
+
+# test insert
+// $testData = 'record_id,insurance\r\n2,1';
+// $results = \REDCap::saveData(
+	// PID, 
+	// 'csv',
+	// $testData
+// );
+// echo "<pre>" . print_r($results, true) . "</pre>";
+// exit;

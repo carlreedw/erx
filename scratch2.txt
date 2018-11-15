@@ -1,0 +1,994 @@
+array(1) {
+  ["175881000000000000000"]=>
+  array(2) {
+    [41]=>
+    array(139) {
+      ["record_id"]=>
+      string(21) "175881000000000000000"
+      ["import_date"]=>
+      string(0) ""
+      ["mrn_gpi"]=>
+      string(0) ""
+      ["sex"]=>
+      string(0) ""
+      ["ethnicity"]=>
+      string(0) ""
+      ["race"]=>
+      string(0) ""
+      ["date_birth"]=>
+      string(0) ""
+      ["age"]=>
+      string(0) ""
+      ["insurance"]=>
+      string(0) ""
+      ["oop"]=>
+      string(0) ""
+      ["zip"]=>
+      string(0) ""
+      ["med_name"]=>
+      string(0) ""
+      ["clinic"]=>
+      string(0) ""
+      ["clinic_level"]=>
+      string(0) ""
+      ["vsp_pat"]=>
+      string(0) ""
+      ["vumc_employee"]=>
+      string(0) ""
+      ["deceased"]=>
+      string(0) ""
+      ["ibd_clinic"]=>
+      string(0) ""
+      ["inclusion_pdc"]=>
+      string(0) ""
+      ["baseline_data_complete"]=>
+      string(1) "0"
+      ["last_fill_date"]=>
+      string(0) ""
+      ["measure_date"]=>
+      string(0) ""
+      ["gap_days"]=>
+      string(0) ""
+      ["pdc_measurement_4mths"]=>
+      string(0) ""
+      ["pdc_measurement_12mths"]=>
+      string(0) ""
+      ["pdc_measurement_complete"]=>
+      string(0) ""
+      ["non_adherence"]=>
+      string(0) ""
+      ["non_adherence_yes"]=>
+      array(5) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["clinical"]=>
+      string(0) ""
+      ["outside_fills"]=>
+      string(0) ""
+      ["med_discontinuation"]=>
+      string(0) ""
+      ["text_other"]=>
+      string(0) ""
+      ["reasons_for_expected_nonadherence_complete"]=>
+      string(1) "0"
+      ["confirm"]=>
+      string(0) ""
+      ["treat"]=>
+      string(0) ""
+      ["randomization_complete"]=>
+      string(1) "0"
+      ["non_adherence_no"]=>
+      array(7) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+        [6]=>
+        string(1) "0"
+      }
+      ["financial_reason"]=>
+      string(0) ""
+      ["affordability"]=>
+      string(0) ""
+      ["other_finance_reason"]=>
+      string(0) ""
+      ["clinical_reason"]=>
+      array(2) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+      }
+      ["clinical_other_reason"]=>
+      string(0) ""
+      ["hl_comprehension_reason"]=>
+      string(0) ""
+      ["other_comprehsion_reasons"]=>
+      string(0) ""
+      ["memory_reason"]=>
+      string(0) ""
+      ["unreach_reason"]=>
+      string(0) ""
+      ["unresponsive_reason"]=>
+      array(3) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+      }
+      ["clinic_unresponse_reason"]=>
+      array(2) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+      }
+      ["finance_unresponse_reason"]=>
+      array(1) {
+        [0]=>
+        string(1) "0"
+      }
+      ["other_unresponse_reason"]=>
+      string(0) ""
+      ["pharm_error"]=>
+      string(0) ""
+      ["reasons_for_unexpected_nonadherence_complete"]=>
+      string(1) "0"
+      ["perform_ben_investigations"]=>
+      string(0) ""
+      ["date_bi"]=>
+      string(0) ""
+      ["findings_of_bi"]=>
+      string(0) ""
+      ["insurance_network"]=>
+      string(0) ""
+      ["coverage_type"]=>
+      string(0) ""
+      ["coverage_type_insurance"]=>
+      array(5) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+      }
+      ["othercoverage_text"]=>
+      string(0) ""
+      ["lapse_due"]=>
+      array(2) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+      }
+      ["type_pharmacy_coverage"]=>
+      array(3) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["other_pharmacy_coverage"]=>
+      string(0) ""
+      ["type_temp_finan_issues"]=>
+      string(0) ""
+      ["type_drug_coverage_lapse"]=>
+      array(4) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["insurance_status"]=>
+      string(0) ""
+      ["reasons_no_insurance"]=>
+      array(4) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["other_no_insurance"]=>
+      string(0) ""
+      ["reasons_insurance_pending"]=>
+      array(3) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["other_reasons_ins_pending"]=>
+      string(0) ""
+      ["other_reasons_btwn_ins"]=>
+      string(0) ""
+      ["other_tmp_finance_issues"]=>
+      string(0) ""
+      ["clinical_medication"]=>
+      string(0) ""
+      ["contact_mitigate_effects"]=>
+      string(0) ""
+      ["side_effect_notes"]=>
+      string(0) ""
+      ["ancillary_treatment_adj"]=>
+      string(0) ""
+      ["ancillary_treatment_notes"]=>
+      string(0) ""
+      ["side_effect_management"]=>
+      string(0) ""
+      ["management_notes"]=>
+      string(0) ""
+      ["med_education_treatment"]=>
+      string(0) ""
+      ["medication_treatment_notes"]=>
+      string(0) ""
+      ["belief_medication"]=>
+      array(5) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+      }
+      ["notes_zoom_counsel"]=>
+      string(0) ""
+      ["notes_krames_pharmacist"]=>
+      string(0) ""
+      ["notes_option_provider"]=>
+      string(0) ""
+      ["notes_therapy_changed"]=>
+      string(0) ""
+      ["notes_other_belief"]=>
+      string(0) ""
+      ["admin_modality"]=>
+      array(4) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["other_admin_modality"]=>
+      string(0) ""
+      ["admin_schedule_reason"]=>
+      array(5) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["side_effect_admin_reason"]=>
+      array(5) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+      }
+      ["notes_side_effects"]=>
+      string(0) ""
+      ["notes_side_effects_meds"]=>
+      string(0) ""
+      ["notes_side_effects_patient"]=>
+      string(0) ""
+      ["notes_side_effects_treat"]=>
+      string(0) ""
+      ["other_side_effects"]=>
+      string(0) ""
+      ["type_burdens"]=>
+      array(4) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["notes_burden_burdensome"]=>
+      string(0) ""
+      ["notes_burden_patient"]=>
+      string(0) ""
+      ["notes_burden_therapy"]=>
+      string(0) ""
+      ["notes_burden_other"]=>
+      string(0) ""
+      ["lack_understanding"]=>
+      array(6) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+        [6]=>
+        string(1) "0"
+      }
+      ["other_lack_understand"]=>
+      string(0) ""
+      ["language_barriers"]=>
+      array(4) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+      }
+      ["notes_language_interpreter"]=>
+      string(0) ""
+      ["notes_language_assist"]=>
+      string(0) ""
+      ["notes_language_edu"]=>
+      string(0) ""
+      ["notes_language_other"]=>
+      string(0) ""
+      ["mental_impairment"]=>
+      array(2) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+      }
+      ["notes_mental_education"]=>
+      string(0) ""
+      ["other_impairment"]=>
+      string(0) ""
+      ["memory_indication"]=>
+      array(3) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["notes_memory_counseling"]=>
+      string(0) ""
+      ["notes_adherence_plan"]=>
+      string(0) ""
+      ["notes_memory_other"]=>
+      string(0) ""
+      ["unreachable_reasons"]=>
+      array(5) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+        [4]=>
+        string(1) "0"
+        [5]=>
+        string(1) "0"
+      }
+      ["unreachable_contactplan"]=>
+      string(0) ""
+      ["other_unreachable"]=>
+      string(0) ""
+      ["unresponsive_reasons_type"]=>
+      array(2) {
+        [0]=>
+        string(1) "0"
+        [1]=>
+        string(1) "0"
+      }
+      ["clinical_unresponsive"]=>
+      array(3) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["clinical_other_reasons"]=>
+      string(0) ""
+      ["financial_unresponsive"]=>
+      array(3) {
+        [1]=>
+        string(1) "0"
+        [2]=>
+        string(1) "0"
+        [3]=>
+        string(1) "0"
+      }
+      ["financial_other_reasons"]=>
+      string(0) ""
+      ["interventions_complete"]=>
+      string(1) "0"
+      ["date_followup"]=>
+      string(0) ""
+      ["time_interval"]=>
+      string(0) ""
+      ["other_time_interval"]=>
+      string(0) ""
+      ["notes_followup"]=>
+      string(0) ""
+      ["followup_plan_complete"]=>
+      string(1) "0"
+      ["date_outcome_4mo"]=>
+      string(0) ""
+      ["ed_visit_4mo"]=>
+      string(0) ""
+      ["hospitalizaion_4mo"]=>
+      string(0) ""
+      ["pdc_4mo_date"]=>
+      string(0) ""
+      ["pdc_4mo"]=>
+      string(0) ""
+      ["date_8mo_analysis"]=>
+      string(0) ""
+      ["ed_8mo"]=>
+      string(0) ""
+      ["hospitalization_8mo"]=>
+      string(0) ""
+      ["pdc_8mo_date"]=>
+      string(0) ""
+      ["pdc_8mo"]=>
+      string(0) ""
+      ["outcomes_complete"]=>
+      string(1) "0"
+    }
+    ["repeat_instances"]=>
+    array(1) {
+      [41]=>
+      array(1) {
+        ["pdc_measurement"]=>
+        array(1) {
+          [1]=>
+          array(139) {
+            ["record_id"]=>
+            string(21) "175881000000000000000"
+            ["import_date"]=>
+            string(0) ""
+            ["mrn_gpi"]=>
+            string(0) ""
+            ["sex"]=>
+            string(0) ""
+            ["ethnicity"]=>
+            string(0) ""
+            ["race"]=>
+            string(0) ""
+            ["date_birth"]=>
+            string(0) ""
+            ["age"]=>
+            string(0) ""
+            ["insurance"]=>
+            string(0) ""
+            ["oop"]=>
+            string(0) ""
+            ["zip"]=>
+            string(0) ""
+            ["med_name"]=>
+            string(0) ""
+            ["clinic"]=>
+            string(0) ""
+            ["clinic_level"]=>
+            string(0) ""
+            ["vsp_pat"]=>
+            string(0) ""
+            ["vumc_employee"]=>
+            string(0) ""
+            ["deceased"]=>
+            string(0) ""
+            ["ibd_clinic"]=>
+            string(0) ""
+            ["inclusion_pdc"]=>
+            string(0) ""
+            ["baseline_data_complete"]=>
+            string(0) ""
+            ["last_fill_date"]=>
+            string(10) "2018-09-06"
+            ["measure_date"]=>
+            string(10) "2018-11-11"
+            ["gap_days"]=>
+            string(2) "45"
+            ["pdc_measurement_4mths"]=>
+            string(4) "65.1"
+            ["pdc_measurement_12mths"]=>
+            string(4) "83.5"
+            ["pdc_measurement_complete"]=>
+            string(1) "0"
+            ["non_adherence"]=>
+            string(0) ""
+            ["non_adherence_yes"]=>
+            array(5) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["clinical"]=>
+            string(0) ""
+            ["outside_fills"]=>
+            string(0) ""
+            ["med_discontinuation"]=>
+            string(0) ""
+            ["text_other"]=>
+            string(0) ""
+            ["reasons_for_expected_nonadherence_complete"]=>
+            string(0) ""
+            ["confirm"]=>
+            string(0) ""
+            ["treat"]=>
+            string(0) ""
+            ["randomization_complete"]=>
+            string(0) ""
+            ["non_adherence_no"]=>
+            array(7) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+              [6]=>
+              string(0) ""
+            }
+            ["financial_reason"]=>
+            string(0) ""
+            ["affordability"]=>
+            string(0) ""
+            ["other_finance_reason"]=>
+            string(0) ""
+            ["clinical_reason"]=>
+            array(2) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+            }
+            ["clinical_other_reason"]=>
+            string(0) ""
+            ["hl_comprehension_reason"]=>
+            string(0) ""
+            ["other_comprehsion_reasons"]=>
+            string(0) ""
+            ["memory_reason"]=>
+            string(0) ""
+            ["unreach_reason"]=>
+            string(0) ""
+            ["unresponsive_reason"]=>
+            array(3) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+            }
+            ["clinic_unresponse_reason"]=>
+            array(2) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+            }
+            ["finance_unresponse_reason"]=>
+            array(1) {
+              [0]=>
+              string(0) ""
+            }
+            ["other_unresponse_reason"]=>
+            string(0) ""
+            ["pharm_error"]=>
+            string(0) ""
+            ["reasons_for_unexpected_nonadherence_complete"]=>
+            string(0) ""
+            ["perform_ben_investigations"]=>
+            string(0) ""
+            ["date_bi"]=>
+            string(0) ""
+            ["findings_of_bi"]=>
+            string(0) ""
+            ["insurance_network"]=>
+            string(0) ""
+            ["coverage_type"]=>
+            string(0) ""
+            ["coverage_type_insurance"]=>
+            array(5) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+            }
+            ["othercoverage_text"]=>
+            string(0) ""
+            ["lapse_due"]=>
+            array(2) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+            }
+            ["type_pharmacy_coverage"]=>
+            array(3) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["other_pharmacy_coverage"]=>
+            string(0) ""
+            ["type_temp_finan_issues"]=>
+            string(0) ""
+            ["type_drug_coverage_lapse"]=>
+            array(4) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["insurance_status"]=>
+            string(0) ""
+            ["reasons_no_insurance"]=>
+            array(4) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["other_no_insurance"]=>
+            string(0) ""
+            ["reasons_insurance_pending"]=>
+            array(3) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["other_reasons_ins_pending"]=>
+            string(0) ""
+            ["other_reasons_btwn_ins"]=>
+            string(0) ""
+            ["other_tmp_finance_issues"]=>
+            string(0) ""
+            ["clinical_medication"]=>
+            string(0) ""
+            ["contact_mitigate_effects"]=>
+            string(0) ""
+            ["side_effect_notes"]=>
+            string(0) ""
+            ["ancillary_treatment_adj"]=>
+            string(0) ""
+            ["ancillary_treatment_notes"]=>
+            string(0) ""
+            ["side_effect_management"]=>
+            string(0) ""
+            ["management_notes"]=>
+            string(0) ""
+            ["med_education_treatment"]=>
+            string(0) ""
+            ["medication_treatment_notes"]=>
+            string(0) ""
+            ["belief_medication"]=>
+            array(5) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+            }
+            ["notes_zoom_counsel"]=>
+            string(0) ""
+            ["notes_krames_pharmacist"]=>
+            string(0) ""
+            ["notes_option_provider"]=>
+            string(0) ""
+            ["notes_therapy_changed"]=>
+            string(0) ""
+            ["notes_other_belief"]=>
+            string(0) ""
+            ["admin_modality"]=>
+            array(4) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["other_admin_modality"]=>
+            string(0) ""
+            ["admin_schedule_reason"]=>
+            array(5) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["side_effect_admin_reason"]=>
+            array(5) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+            }
+            ["notes_side_effects"]=>
+            string(0) ""
+            ["notes_side_effects_meds"]=>
+            string(0) ""
+            ["notes_side_effects_patient"]=>
+            string(0) ""
+            ["notes_side_effects_treat"]=>
+            string(0) ""
+            ["other_side_effects"]=>
+            string(0) ""
+            ["type_burdens"]=>
+            array(4) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["notes_burden_burdensome"]=>
+            string(0) ""
+            ["notes_burden_patient"]=>
+            string(0) ""
+            ["notes_burden_therapy"]=>
+            string(0) ""
+            ["notes_burden_other"]=>
+            string(0) ""
+            ["lack_understanding"]=>
+            array(6) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+              [6]=>
+              string(0) ""
+            }
+            ["other_lack_understand"]=>
+            string(0) ""
+            ["language_barriers"]=>
+            array(4) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+            }
+            ["notes_language_interpreter"]=>
+            string(0) ""
+            ["notes_language_assist"]=>
+            string(0) ""
+            ["notes_language_edu"]=>
+            string(0) ""
+            ["notes_language_other"]=>
+            string(0) ""
+            ["mental_impairment"]=>
+            array(2) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+            }
+            ["notes_mental_education"]=>
+            string(0) ""
+            ["other_impairment"]=>
+            string(0) ""
+            ["memory_indication"]=>
+            array(3) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["notes_memory_counseling"]=>
+            string(0) ""
+            ["notes_adherence_plan"]=>
+            string(0) ""
+            ["notes_memory_other"]=>
+            string(0) ""
+            ["unreachable_reasons"]=>
+            array(5) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+              [4]=>
+              string(0) ""
+              [5]=>
+              string(0) ""
+            }
+            ["unreachable_contactplan"]=>
+            string(0) ""
+            ["other_unreachable"]=>
+            string(0) ""
+            ["unresponsive_reasons_type"]=>
+            array(2) {
+              [0]=>
+              string(0) ""
+              [1]=>
+              string(0) ""
+            }
+            ["clinical_unresponsive"]=>
+            array(3) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["clinical_other_reasons"]=>
+            string(0) ""
+            ["financial_unresponsive"]=>
+            array(3) {
+              [1]=>
+              string(0) ""
+              [2]=>
+              string(0) ""
+              [3]=>
+              string(0) ""
+            }
+            ["financial_other_reasons"]=>
+            string(0) ""
+            ["interventions_complete"]=>
+            string(0) ""
+            ["date_followup"]=>
+            string(0) ""
+            ["time_interval"]=>
+            string(0) ""
+            ["other_time_interval"]=>
+            string(0) ""
+            ["notes_followup"]=>
+            string(0) ""
+            ["followup_plan_complete"]=>
+            string(0) ""
+            ["date_outcome_4mo"]=>
+            string(0) ""
+            ["ed_visit_4mo"]=>
+            string(0) ""
+            ["hospitalizaion_4mo"]=>
+            string(0) ""
+            ["pdc_4mo_date"]=>
+            string(0) ""
+            ["pdc_4mo"]=>
+            string(0) ""
+            ["date_8mo_analysis"]=>
+            string(0) ""
+            ["ed_8mo"]=>
+            string(0) ""
+            ["hospitalization_8mo"]=>
+            string(0) ""
+            ["pdc_8mo_date"]=>
+            string(0) ""
+            ["pdc_8mo"]=>
+            string(0) ""
+            ["outcomes_complete"]=>
+            string(0) ""
+          }
+        }
+      }
+    }
+  }
+}
