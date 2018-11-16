@@ -116,5 +116,5 @@ $output .= "\t" . print_r($results['ids'], true) . "\n\n";
 echo "<pre>$output</pre>";
 
 # write to server log folder
-$log = fopen("/app001/www-logs/erx_cron_log", "a");
+$log = fopen("erx_cron_log.log", "a");
 fwrite($log, $output);
