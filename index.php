@@ -8,7 +8,6 @@
 
 // Call the REDCap Connect file in the main "redcap" directory
 require_once "../../redcap_connect.php";
-require_once "base.php";
 
 # project variables
 define("PID", 14);
@@ -39,9 +38,6 @@ for ($i = 1; $i < $rows; $i++) {
 	# get record_id for this pair of imported rows
 	$rid = $line1[0];
 	
-	# set last_fill_date for all records to today
-	$newLastFillDate = (new DateTime())->format("Y-m-d");
-	
 	# see if already randomized
 	$recordData = \REDCap::getData(PID, 'array', $rid);
 	$saveNeeded = true;
@@ -52,6 +48,9 @@ for ($i = 1; $i < $rows; $i++) {
 			$saveNeeded = false;
 			$ignored[$rid] = "reason for ignore -- randomized already / confirm = 1 and randomization_complete = 2";
 		}
+		
+		$newLastFillDate = $line2[18];
+		
 		# if last_fill_date > import_data, don't save
 		$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line2[1]][$line2[2]]["last_fill_date"];
 		if ($existingFillDate >= $newLastFillDate) {
@@ -59,7 +58,7 @@ for ($i = 1; $i < $rows; $i++) {
 			$saveNeeded = false;
 			$ignored[$rid] = "reason: existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $line1[3].")";
 		} else {
-			echo "existing: ".$existingFillDate." -- current: $newLastFillDate\n";
+			echo "existing: $existingFillDate -- current: $newLastFillDate\n";
 		}
 	}
 	

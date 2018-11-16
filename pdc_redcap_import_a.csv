@@ -1,7 +1,0 @@
-record_id,redcap_repeat_instrument,redcap_repeat_instance,import_date,mrn_gpi,sex,date_birth,age,insurance,oop,pat_zip,med_name,clinic,clinic_level,vsp_pat,vumc_12mths,vumc_employee,inclusion_pdc,last_fill_date,measure_date,gap_days,pdc_measurement_4mths,pdc_measurement_12mths
-175881000000000000000,,,11/12/2018,175881000000000000000,0,1/22/1949,70,2,0,37064,EVOLOCUMAB,LIPIDS,1,1,,,65.1,,,,,
-175881000000000000000,pdc_measurement,1,,,,,,,,,,,,,,,,9/6/2018,11/11/2018,45,65.1,83.5
-195854000000000000000,,,11/12/2018,195854000000000000000,0,10/27/1949,69,2,0,37015,NILOTINIB HCL,HEMATOLOGY,2,1,,,54.5,,,,,
-195854000000000000000,pdc_measurement,1,,,,,,,,,,,,,,,,11/1/2018,11/11/2018,55,54.5,57.4
-199645000000000000000,,,11/12/2018,199645000000000000000,0,12/14/1949,69,2,0,37090,COAGULATION FACTOR IX RECOMB ALBUMIN FUSION PROTEIN (RIX-FP),HEMOPHILIA,1,1,,,81.8,,,,,
-199645000000000000000,pdc_measurement,1,,,,,,,,,,,,,,,,10/1/2018,11/11/2018,20,81.8,66.1
