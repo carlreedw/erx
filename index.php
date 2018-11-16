@@ -117,5 +117,7 @@ echo "<pre>$output</pre>";
 
 # write to server log folder
 $log = fopen("erx_cron_log.log", "a");
-if (!$log) {echo "log not created";}
+if (!$log) {
+	echo "<pre>\ncan't open log file:\n" . print_r(error_get_last(), true) . "</pre>";
+}
 fwrite($log, $output);
