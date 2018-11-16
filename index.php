@@ -121,7 +121,6 @@ $results = \REDCap::saveData(
 );
 
 $output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s") . "\n";
-
 $output .= "\tAttempting to read from data file at: " . DATA_FILE_PATH . "\n";
 $output .= "\tTargeting REDCap project with project ID: " . PID . "\n";
 $output .= "\tCSV data row pairs to import: ".($rows - 1)."\n";
@@ -129,6 +128,10 @@ $output .= "\tTotal records ignored: " . count($ignored) . "\n";
 $output .= "\t" . print_r($ignored, true) . "\n";
 $output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
 $output .= "\t" . print_r($results['ids'], true) . "\n";
+
+# test output
+$output .= "\t" . print_r($results, true). "\n";
+$output .= "\t" . print_r($data, true). "\n";
 
 # echo to client
 echo "<pre>$output</pre>";
