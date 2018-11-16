@@ -117,4 +117,5 @@ echo "<pre>$output</pre>";
 
 # write to server log folder
 $log = fopen("erx_cron_log.log", "a");
+if (!$log) {echo "log not created";}
 fwrite($log, $output);
