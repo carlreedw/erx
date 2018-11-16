@@ -8,9 +8,9 @@
 
 // Call the REDCap Connect file in the main "redcap" directory
 require_once "../../redcap_connect.php";
+require_once "base.php";
 
 # project variables
-define("PID", 14);
 $project = new \Project(PID);
 $eid = $project->firstEventId;
 
