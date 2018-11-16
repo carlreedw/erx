@@ -51,11 +51,8 @@ for ($i = 1; $i < $rows; $i++) {
 		# if last_fill_date > import_data, don't save
 		$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line2[1]][$line2[2]]["last_fill_date"];
 		if ($existingFillDate >= $line2[18]) {
-			// echo "\nin";
 			$saveNeeded = false;
 			$ignored[$rid] = "reason: existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $line1[3].")";
-		} else {
-			echo "existing: $existingFillDate -- current: " . $line2[18] . "\n";
 		}
 	}
 	
@@ -119,5 +116,5 @@ $output .= "\t" . print_r($results['ids'], true) . "\n\n";
 echo "<pre>$output</pre>";
 
 # write to server log folder
-$log = fopen("/app001/www-logs/erx_cron_log");
+$log = fopen("/app001/www-logs/erx_cron_log", "a");
 fwrite($log, $output);
