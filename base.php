@@ -17,7 +17,7 @@ if(!defined("ENVIRONMENT")) {
 			define("PID", 1147);
 			// define("LOG_PATH", "/app001/www/redcap/plugins/erx/erx_cron_log.log");
 			define("LOG_PATH", dirname(__FILE__) . DIRECTORY_SEPARATOR . "erx_cron_log.log");
-			define("DATA_FILE_PATH", "\\bigdatavuhcifs.mc.vanderbilt.edu\phr\LIBRARY\Outpatient\SPECIALTY PHARMACY SERVICES\AdherenceClinic\pdc_redcap_import.csv");
+			define("DATA_FILE_PATH", "file://bigdatavuhcifs.mc.vanderbilt.edu/phr/LIBRARY/Outpatient/SPECIALTY%20PHARMACY%20SERVICES/AdherenceClinic/pdc_redcap_import.csv");
 			// define("DATA_FILE_PATH", dirname(__FILE__) . DIRECTORY_SEPARATOR . "sample_pdc_redcap_import.csv");
 		}
 	} else {
