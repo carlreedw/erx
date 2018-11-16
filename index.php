@@ -20,11 +20,8 @@ $project = new \Project(PID);
 $eid = $project->firstEventId;
 
 # import variables
-if (ENVIRONMENT == "DEV") {
-	$imported = file(DATA_FILE_PATH);
-} else {
-	$imported = fopen("ftp://bigdatavuhcifs.mc.vanderbilt.edu/phr/LIBRARY/Outpatient/SPECIALTY PHARMACY SERVICES/AdherenceClinic/pdc_redcap_import.csv")
-}
+$imported = file(DATA_FILE_PATH);
+
 
 # make sure we have an import file
 if (empty($imported) || !$imported) {
