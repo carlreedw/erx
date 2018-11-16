@@ -129,9 +129,9 @@ $output .= "\t" . print_r($ignored, true) . "\n";
 $output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
 $output .= "\t" . print_r($results['ids'], true) . "\n";
 
-# test output
-$output .= "\t" . print_r($results, true). "\n";
-$output .= "\t" . print_r($data, true). "\n";
+# check output
+// $output .= "\t" . print_r($results, true). "\n";
+// $output .= "\t" . print_r($data, true). "\n";
 
 # echo to client
 echo "<pre>$output</pre>";
