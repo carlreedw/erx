@@ -20,10 +20,14 @@ $project = new \Project(PID);
 $eid = $project->firstEventId;
 
 # import variables
-$imported = file(DATA_FILE_PATH);
+if (ENVIRONMENT == "DEV") {
+	$imported = file(DATA_FILE_PATH);
+} else {
+	$imported = fopen("ftp://bigdatavuhcifs.mc.vanderbilt.edu/phr/LIBRARY/Outpatient/SPECIALTY PHARMACY SERVICES/AdherenceClinic/pdc_redcap_import.csv")
+}
 
 # make sure we have an import file
-if (empty($imported)) {
+if (empty($imported) || !$imported) {
 	$errorMessage = "Error: Stopping plugin execution. Couldn't open data file at " . DATA_FILE_PATH;
 	echo $errorMessage;
 	if ($log) {
