@@ -20,11 +20,10 @@ $project = new \Project(PID);
 $eid = $project->firstEventId;
 
 # import variables
-$importDataFilename = "sample_pdc_redcap_import.csv";
 $imported = file(DATA_FILE_PATH);
 
 # make sure we have an import file
-if (!$imported) {
+if (empty($imported)) {
 	$errorMessage = "Error: Stopping plugin execution. Couldn't open data file at " . DATA_FILE_PATH;
 	echo $errorMessage;
 	if ($log) {
@@ -121,13 +120,17 @@ $results = \REDCap::saveData(
 	$commitData = TRUE
 );
 
+echo "<pre>".print_r($results, true) . "\n</pre>";
+
 $output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s") . "\n";
+
 $output .= "\tAttempting to read from data file at: " . DATA_FILE_PATH . "\n";
 $output .= "\tTargeting REDCap project with project ID: " . PID . "\n";
+$output .= "\tRows to import: $rows\n";
 $output .= "\tTotal records ignored: " . count($ignored) . "\n";
 $output .= "\t" . print_r($ignored, true) . "\n";
 $output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
-$output .= "\t" . print_r($results['ids'], true) . "\n\n";
+$output .= "\t" . print_r($results['ids'], true) . "\n";
 
 # echo to client
 echo "<pre>$output</pre>";

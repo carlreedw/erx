@@ -20,7 +20,7 @@ if(!defined("ENVIRONMENT")) {
 	} else {
 		define("ENVIRONMENT", "DEV");
 		define("PID", 14);
-		define("LOG_PATH", dirname(__FILE__) . "/erx_cron_log.log");
-		define("DATA_FILE_PATH", dirname(__FILE__) . "/sample_pdc_redcap_import.csv");
+		define("LOG_PATH", dirname(__FILE__) . DIRECTORY_SEPARATOR . "erx_cron_log.log");
+		define("DATA_FILE_PATH", dirname(__FILE__) . DIRECTORY_SEPARATOR . "sample_pdc_redcap_import.csv");
 	}
 }

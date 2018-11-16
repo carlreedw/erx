@@ -1,4 +1,9 @@
-ERX plugin ran on: 2018-11-16 04:11:32	Total records ignored: 0
+
+ERX plugin ran on: 2018-11-16 05:11:15
+	Attempting to read from data file at: C:\UniServerZ\www\redcap\plugins\erx\sample_pdc_redcap_import.csv
+	Targeting REDCap project with project ID: 14
+	Rows to import: 19
+	Total records ignored: 0
 	Array
 (
 )
@@ -8,4 +13,18 @@ ERX plugin ran on: 2018-11-16 04:11:32	Total records ignored: 0
 (
 )
 
+
+ERX plugin ran on: 2018-11-16 05:11:53
+	Attempting to read from data file at: C:\UniServerZ\www\redcap\plugins\erx\sample_pdc_redcap_import.csv
+	Targeting REDCap project with project ID: 14
+	Rows to import: 19
+	Total records ignored: 0
+	Array
+(
+)
+
+	Total records added/updated: 0
+	Array
+(
+)
 
