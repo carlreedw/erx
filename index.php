@@ -15,13 +15,12 @@ $project = new \Project(PID);
 $eid = $project->firstEventId;
 
 # import variables
-$importDataFilename = "pdc_redcap_import.csv";
+$importDataFilename = "sample_pdc_redcap_import.csv";
 $imported = file($importDataFilename);
 
 $data = [];
 $ignored = [];
 
-echo "<pre>\n";
 // # process imported data so that $baselineData and $pdcData will be ready to save
 
 $rows = ((count($imported) + 1) / 2);
@@ -49,16 +48,14 @@ for ($i = 1; $i < $rows; $i++) {
 			$ignored[$rid] = "reason for ignore -- randomized already / confirm = 1 and randomization_complete = 2";
 		}
 		
-		$newLastFillDate = $line2[18];
-		
 		# if last_fill_date > import_data, don't save
 		$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line2[1]][$line2[2]]["last_fill_date"];
-		if ($existingFillDate >= $newLastFillDate) {
+		if ($existingFillDate >= $line2[18]) {
 			// echo "\nin";
 			$saveNeeded = false;
 			$ignored[$rid] = "reason: existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $line1[3].")";
 		} else {
-			echo "existing: $existingFillDate -- current: $newLastFillDate\n";
+			echo "existing: $existingFillDate -- current: " . $line2[18] . "\n";
 		}
 	}
 	
@@ -77,8 +74,8 @@ for ($i = 1; $i < $rows; $i++) {
 				"zip" => $line1[10],
 				"med_name" => $line1[11],
 				"clinic" => $line1[12],
-				"clinic_level" => $line1[13]
-				// "vsp_pat" => $line1[14]
+				"clinic_level" => $line1[13],
+				"vsp_pat" => $line1[14]
 			],
 			"repeat_instances" => [
 				$eid => [
@@ -86,8 +83,7 @@ for ($i = 1; $i < $rows; $i++) {
 					$line2[1] => [
 						# 1 or int
 						$line2[2] => [
-							// "last_fill_date" => $line2[18],
-							"last_fill_date" => $newLastFillDate,
+							"last_fill_date" => $$line2[18],
 							"measure_date" => $line2[19],
 							"gap_days" => $line2[20],
 							"pdc_measurement_4mths" => $line2[21],
@@ -113,12 +109,15 @@ $results = \REDCap::saveData(
 	$commitData = TRUE
 );
 
-// print_r($results);
+$output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s");
+$output .= "\tTotal records ignored: " . count($ignored) . "\n";
+$output .= "\t" . print_r($ignored, true) . "\n";
+$output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
+$output .= "\t" . print_r($results['ids'], true) . "\n\n";
 
-echo "Total records ignored: " . count($ignored) . "\n";
-print_r($ignored);
+# echo to client
+echo "<pre>$output</pre>";
 
-echo "\n\nTotal records added/updated: " . count($results['ids']) . "\n";
-print_r($results['ids']);
-
-echo "</pre>";
+# write to server log folder
+$log = fopen("/app001/www-logs/erx_cron_log");
+fwrite($log, $output);
