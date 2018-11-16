@@ -10,13 +10,28 @@
 require_once "../../redcap_connect.php";
 require_once "base.php";
 
+$log = fopen(LOG_PATH, "a");
+if (!$log) {
+	echo "<pre>Failed to open log file:\n" . print_r(error_get_last(), true) . "\n</pre>";
+}
+
 # project variables
 $project = new \Project(PID);
 $eid = $project->firstEventId;
 
 # import variables
 $importDataFilename = "sample_pdc_redcap_import.csv";
-$imported = file($importDataFilename);
+$imported = file(DATA_FILE_PATH);
+
+# make sure we have an import file
+if (!$imported) {
+	$errorMessage = "Error: Stopping plugin execution. Couldn't open data file at " . DATA_FILE_PATH;
+	echo $errorMessage;
+	if ($log) {
+		fwrite($log, $errorMessage);
+	}
+	exit;
+}
 
 $data = [];
 $ignored = [];
@@ -106,7 +121,9 @@ $results = \REDCap::saveData(
 	$commitData = TRUE
 );
 
-$output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s");
+$output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s") . "\n";
+$output .= "\tAttempting to read from data file at: " . DATA_FILE_PATH . "\n";
+$output .= "\tTargeting REDCap project with project ID: " . PID . "\n";
 $output .= "\tTotal records ignored: " . count($ignored) . "\n";
 $output .= "\t" . print_r($ignored, true) . "\n";
 $output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
@@ -116,8 +133,6 @@ $output .= "\t" . print_r($results['ids'], true) . "\n\n";
 echo "<pre>$output</pre>";
 
 # write to server log folder
-$log = fopen("erx_cron_log.log", "a");
-if (!$log) {
-	echo "<pre>\ncan't open log file:\n" . print_r(error_get_last(), true) . "</pre>";
+if ($log) {
+	fwrite($log, $output);
 }
-fwrite($log, $output);
