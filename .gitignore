@@ -1,1 +1,2 @@
-erx_cron_log.log
+/vendor
+log.txt
