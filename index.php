@@ -6,15 +6,25 @@
  * AUTHOR: carl.w.reed@vumc.org
  */
 
+# includes
 require_once "../../redcap_connect.php";
 include_once('vendor/autoload.php');
 require_once "base.php";
-$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials\adherence.php';
-include_once($credFilepath);
+
+# auth
+$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials\adherence.txt';
+$creds = file_get_contents($credFilepath);
+$host = 'sftp.vumc.org';
+$port = 22;
+preg_match('/user: (.*)$/m', $creds, $matches);
+$username = $matches[1];
+preg_match('/passwd: (.*)$/', $creds, $matches);
+$password = $matches[1];
 if(!$username or !$password or !$host){
 	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact your REDCap administrator.");
 }
 
+# fetch data to be imported and process it
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
 $filesystem = new Filesystem(new SftpAdapter([
@@ -26,7 +36,6 @@ $filesystem = new Filesystem(new SftpAdapter([
     'root' => '/files/',
     'timeout' => 10,
 ]));
-
 $importFilename = 'pdc_redcap_import.csv';
 $contents = $filesystem->listContents(".", true);
 foreach($contents as $i => $file) {
