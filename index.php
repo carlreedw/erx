@@ -22,11 +22,6 @@ $host = 'sftp.vumc.org';
 $port = 22;
 $credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
 $creds = file_get_contents($credFilepath);
-
-echo "credfilepath: $credFilepath<br />";
-echo "creds 5: " . substr($creds, 0, 5) . "<br />";
-exit;
-
 preg_match('/user: (.+)$/m', $creds, $matches);
 $username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);
