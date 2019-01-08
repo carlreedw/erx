@@ -20,7 +20,7 @@ require_once "base.php";
 # fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
-$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials\adherence.txt';
+$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
 $creds = file_get_contents($credFilepath);
 
 echo "credfilepath: $credFilepath<br />";
