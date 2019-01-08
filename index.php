@@ -1,30 +1,34 @@
 <?php
-/**
- * PLUGIN NAME: ERX
- * DESCRIPTION: Automatically add/update records in the Adherence Intervention Study project
- * VERSION: 1.0
- * AUTHOR: carl.w.reed@vumc.org
- */
+/*
+	PLUGIN NAME: ERX
+	DESCRIPTION: Automatically add/update records in the Adherence Intervention Study project
+	VERSION: 1.0
+	AUTHOR: carl.w.reed@vumc.org
+*/
+
+$profiling = time();
 
 # includes
 require_once "../../redcap_connect.php";
 include_once('vendor/autoload.php');
 require_once "base.php";
 
-# auth
-$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials\adherence.txt';
-$creds = file_get_contents($credFilepath);
+# for testing on dev:
+// $filepath = "C:/pdc_redcap_import.csv";
+// $csv = file_get_contents($filepath);
+
+# fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
-preg_match('/user: (.*)$/m', $creds, $matches);
-$username = $matches[1];
+$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials\adherence.txt';
+$creds = file_get_contents($credFilepath);
+preg_match('/user: (.+)$/m', $creds, $matches);
+$username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);
 $password = $matches[1];
 if(!$username or !$password or !$host){
 	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact your REDCap administrator.");
 }
-
-# fetch data to be imported and process it
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
 $filesystem = new Filesystem(new SftpAdapter([
@@ -40,49 +44,97 @@ $importFilename = 'pdc_redcap_import.csv';
 $contents = $filesystem->listContents(".", true);
 foreach($contents as $i => $file) {
 	if($file['path'] == $importFilename){
-		processImport($filesystem->read($file['path']));
+		$csv = $filesystem->read($file['path']);
 	}
 }
 
-function processImport($import){
+# process import file contents
+processImport($csv);
+
+function processImport($import) {
+	if (empty($import) || !$import) {
+		die("ErX plugin failed to find the pdc_redcap_import.csv data");
+	}
+	
+	global $profiling;
+	
 	# project variables
 	$project = new \Project(PID);
 	$eid = $project->firstEventId;
 	$pid = PID;
 	
-	# optionally import from local storage
-	// $import = file(DATA_FILE_PATH);
-	
-	# make sure we have import data
-	if (empty($import) || !$import) {
-		exit;
-	}
-	
+	# $data is what we will send to redcap database
 	$data = [];
+	# $ignored to keep track of which/why records ignored
 	$ignored = [];
+	
+	# separate import file's string data into lines
 	$imported = [];
+	$rows = count($rows);
+	$row = 0;
+	$baseline = false;
+	$pdc = false;
 	
-	foreach(preg_split("/((\r?\n)|(\r\n?))/", $import) as $line){
-		$imported[] = $line;
-	}
-	
-	// # process imported data line-by-line
-	$rows = (count($imported) / 2);
-	// for ($i = 1; $i < $rows; $i++) {
-	for ($i = 1; $i < 5; $i++) {
-		# convert csv to array, baseline data line first, then pdc data line
-		$line1 = str_getcsv($imported[$i*2-1]);
-		$line2 = str_getcsv($imported[$i*2]);
+	foreach(preg_split("/((\r?\n)|(\r\n?))/", $import) as $line) {
+		# convert line string to csv array
+		$line = str_getcsv($line);
+		$row += 1;
+		
+		# skip header and other non-record lines
+		if (!is_numeric(substr($line[0], 0, 1))) continue;
+		
+		# detect baseline data row
+		if ($line[3] and $line[6]) {
+			$baseline = &$line;
+			continue;
+		# pdc data does not have import date
+		} else {
+			if (!$baseline) continue; # we don't have a baseline data row to pair with this pdc row
+			$pdc = &$line;
+		}
+		# we now have a baseline/pdc row pair to evaluate
+		
 		# convert dates
-		$line1[3] = (new DateTime($line1[3]))->format("Y-m-d");
-		$line1[6] = (new DateTime($line1[6]))->format("Y-m-d");
-		$line2[18] = (new DateTime($line2[18]))->format("Y-m-d");
-		$line2[19] = (new DateTime($line2[19]))->format("Y-m-d");
+		$baseline[3] = (new DateTime($baseline[3]))->format("Y-m-d");
+		$baseline[6] = (new DateTime($baseline[6]))->format("Y-m-d");
+		$pdc[18] = (new DateTime($pdc[18]))->format("Y-m-d");
+		$pdc[19] = (new DateTime($pdc[19]))->format("Y-m-d");
 		
 		# get record_id for this pair of imported rows
-		$rid = $line1[0];
+		$rid = $baseline[0];
 		
-		# see if already randomized
+		$newRecord = [
+			$eid => [
+				"import_date" => $baseline[3],
+				"mrn_gpi" => $baseline[4],
+				"sex" => $baseline[5],
+				"date_birth" => $baseline[6],
+				"insurance" => $baseline[8],
+				"oop" => $baseline[9],
+				"zip" => $baseline[10],
+				"med_name" => $baseline[11],
+				"clinic" => $baseline[12],
+				"clinic_level" => $baseline[13],
+				"vsp_pat" => $baseline[14]
+			],
+			"repeat_instances" => [
+				$eid => [
+					# "pdc_measurement"
+					$pdc[1] => [
+						# 1 or int
+						$pdc[2] => [
+							"last_fill_date" => $$pdc[18],
+							"measure_date" => $pdc[19],
+							"gap_days" => $pdc[20],
+							"pdc_measurement_4mths" => $pdc[21],
+							"pdc_measurement_12mths" => $pdc[22],
+						]
+					]
+				]
+			]
+		];
+		
+		# get record's existing data if applicable
 		$recordData = \REDCap::getData($pid, 'array', $rid);
 		
 		$saveNeeded = true;
@@ -91,54 +143,33 @@ function processImport($import){
 			# see if randomized by checking baseline.confirm and baseline.randomization_complete
 			if ($recordData[$rid][$eid]["confirm"] == 1 && $recordData[$rid][$eid]["randomization_complete"] == 2) {
 				$saveNeeded = false;
-				$ignored[$rid] = "ignored: randomized already / confirm = 1 and randomization_complete = 2";
+				$ignored[$rid] = "randomized already / confirm = 1 and randomization_complete = 2";
 			}
 			
 			# if last_fill_date > import_data, don't save
-			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line2[1]][$line2[2]]["last_fill_date"];
-			if ($existingFillDate >= $line2[18]) {
+			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$pdc[1]][$pdc[2]]["last_fill_date"];
+			if ($existingFillDate >= $pdc[18]) {
 				$saveNeeded = false;
-				$ignored[$rid] = "ignored: existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $line1[3].")";
+				$ignored[$rid] = "existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $baseline[3].")";
 			}
+			
+			# if existing record has same data as newRecord, don't bother pushing to db
+			// if (compareRecords($newRecord, $recordData)) {
+				// $saveNeeded = false;
+				// $ignored[$rid] = "existing record has same data values as import rows";
+			// }
 		}
 		
 		if ($saveNeeded) {
-			$data[$rid] = [
-				$eid => [
-					"import_date" => $line1[3],
-					"mrn_gpi" => $line1[4],
-					"sex" => $line1[5],
-					// "ethnicity" => $line1[asoidufhaisduf],
-					// "race" => $line1[asoidufhaisduf],
-					"date_birth" => $line1[6],
-					// "age" => $line1[7],
-					"insurance" => $line1[8],
-					"oop" => $line1[9],
-					"zip" => $line1[10],
-					"med_name" => $line1[11],
-					"clinic" => $line1[12],
-					"clinic_level" => $line1[13],
-					"vsp_pat" => $line1[14]
-				],
-				"repeat_instances" => [
-					$eid => [
-						# "pdc_measurement"
-						$line2[1] => [
-							# 1 or int
-							$line2[2] => [
-								"last_fill_date" => $$line2[18],
-								"measure_date" => $line2[19],
-								"gap_days" => $line2[20],
-								"pdc_measurement_4mths" => $line2[21],
-								"pdc_measurement_12mths" => $line2[22],
-							]
-						]
-					]
-				]
-			];
+			$data[$rid] = &$newRecord;
 		}
+		
+		# collect next baseline row
+		$baseline = false;
+		$pdc = false;
 	}
 	
+	# save data to REDCap db
 	$results = \REDCap::saveData(
 		$project_id = $pid,
 		$dataFormat = 'array',
@@ -152,19 +183,45 @@ function processImport($import){
 		$commitData = TRUE
 	);
 	
-	$output = "ERX plugin ran on: " . (new DateTime())->format("Y-m-d h:m:s") . "\n";
-	$output .= "\tAttempting to read from data file: pdc_redcap_import.csv\n";
-	$output .= "\tTargeting REDCap project with project ID: " . $pid . "\n";
-	$output .= "\tCSV data row pairs to import: ".($rows - 1)."\n";
-	$output .= "\tTotal records added/updated: " . count($results['ids']) . "\n";
-	$output .= "\tTotal records ignored: " . count($ignored) . "\n";
-	$output .= "\tIDs of records added:\n" . print_r($results['ids'], true) . "\n";
-	$output .= "\tIgnored:\n" . print_r($ignored, true) . "\n";
-	
-	// # check output
-	$output .= "\tresults:\n" . print_r($results, true). "\n";
-	$output .= "\tdata:\n" . print_r($data, true). "\n";
-	
-	// # echo to client
-	echo "<pre>$output</pre>";
+	# reporting
+	$profiling = time() - $profiling;
+	echo "<pre>";
+	if (empty($results['errors'])) {
+		echo "Importing to REDCap project with project ID: " . $pid . "\n";
+		echo "Import took a total of $profiling seconds to complete.\n";
+		echo "Imported total of " . count($results['ids']) . " records.\n";
+		echo "Record IDs imported:\n" . print_r($results['ids'], true) . "\n";
+		echo "These (" . count($ignored) . ") records were ignored:\n" . print_r($ignored, true) . "\n";
+		if (!empty($results['warnings'])) {
+			echo "REDCap reported these warnings when trying to save import data\n" . print_r($results['warnings'], true) . "\n";
+			echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+		}
+	} else {
+		echo "Import failed. See errors below:\n" . print_r($results['errors'], true) . "\n";
+		if (!empty($results['warnings'])) {
+			echo "See warnings below:\n" . print_r($results['warnings'], true) . "\n";
+		}
+		echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+	}
+	echo "</pre>";
 }
+
+// function compareRecords($old, $new) {
+	// # check baseline values
+	// foreach ($old[$eid] as $name => $value) {
+		// if ($value != $new[$eid][$name]) {
+			// echo "\$value: $value != \$new[\$eid][\$name]: " . $new[$eid][$name] . "<br />";
+			// return false;
+		// }
+	// }
+	
+	// # check pdc values
+	// foreach ($old['repeat_instances'][$eid][$pdc[1]][$pdc[2]] as $name => $value) {
+		// if ($value != $new['repeat_instances'][$eid][$pdc[1]][$pdc[2]][$name]) {
+			// echo "\$value: $value != \$new['repeat_instances'][\$eid][\$pdc[1]][\$pdc[2]][\$name]: " . $new['repeat_instances'][$eid][$pdc[1]][$pdc[2]][$name] . "<br />";
+			// return false;
+		// }
+	// }
+	
+	// return true;
+// }
