@@ -24,7 +24,7 @@ $credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . '
 $creds = file_get_contents($credFilepath);
 
 echo "credfilepath: $credFilepath<br />";
-// echo "creds: $creds<br />";
+echo "creds 5: " . substr($creds, 0, 5) . "<br />";
 exit;
 
 preg_match('/user: (.+)$/m', $creds, $matches);
