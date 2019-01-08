@@ -60,7 +60,7 @@ function processImport($import){
 	// # process imported data line-by-line
 	$rows = (count($imported) / 2);
 	// for ($i = 1; $i < $rows; $i++) {
-	for ($i = 1; $i < $rows; $i++) {
+	for ($i = 1; $i < 5; $i++) {
 		# convert csv to array, baseline data line first, then pdc data line
 		$line1 = str_getcsv($imported[$i*2-1]);
 		$line2 = str_getcsv($imported[$i*2]);
