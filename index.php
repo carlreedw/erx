@@ -81,7 +81,7 @@ function processImport($import) {
 		$row += 1;
 		
 		# for quicker dev testing, only process first ~10 records
-		// if ($row > 23) break;
+		if ($row > 23) break;
 		
 		# skip header and other non-record lines
 		if (!is_numeric(substr($line[0], 0, 1))) continue;
