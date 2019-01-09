@@ -1,6 +1,6 @@
 <?php
 /*
-	PLUGIN NAME: ERX
+	PLUGIN NAME: erx
 	DESCRIPTION: Automatically add/update records in the Adherence Intervention Study project
 	VERSION: 1.0
 	AUTHOR: carl.w.reed@vumc.org
@@ -13,7 +13,7 @@ require_once "../../redcap_connect.php";
 include_once('vendor/autoload.php');
 require_once "base.php";
 
-# for testing on dev:
+# for quicker testing on dev:
 // $filepath = "C:/pdc_redcap_import.csv";
 // $csv = file_get_contents($filepath);
 
@@ -27,7 +27,7 @@ $username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);
 $password = $matches[1];
 if(!$username or !$password or !$host){
-	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact your REDCap administrator.");
+	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
 }
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
@@ -80,19 +80,22 @@ function processImport($import) {
 		$line = str_getcsv($line);
 		$row += 1;
 		
+		if ($row > 23) break;
+		
 		# skip header and other non-record lines
 		if (!is_numeric(substr($line[0], 0, 1))) continue;
 		
-		# detect baseline data row
-		if ($line[3] and $line[6]) {
-			$baseline = &$line;
-			continue;
-		# pdc data does not have import date
+		# collect a baseline/pdc row pair
+		if ($line[1] == 'pdc_measurement' and $baseline) {
+			$pdc = $line;
 		} else {
-			if (!$baseline) continue; # we don't have a baseline data row to pair with this pdc row
-			$pdc = &$line;
+			$baseline = $line;
+			continue;
 		}
-		# we now have a baseline/pdc row pair to evaluate
+		
+// echo "<pre>" . print_r($baseline, true) . "</pre>";
+// echo "<pre>" . print_r($pdc, true) . "</pre>";
+// exit;
 		
 		# convert dates
 		$baseline[3] = (new DateTime($baseline[3]))->format("Y-m-d");
@@ -152,16 +155,10 @@ function processImport($import) {
 				$saveNeeded = false;
 				$ignored[$rid] = "existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $baseline[3].")";
 			}
-			
-			# if existing record has same data as newRecord, don't bother pushing to db
-			// if (compareRecords($newRecord, $recordData)) {
-				// $saveNeeded = false;
-				// $ignored[$rid] = "existing record has same data values as import rows";
-			// }
 		}
 		
 		if ($saveNeeded) {
-			$data[$rid] = &$newRecord;
+			$data[$rid] = $newRecord;
 		}
 		
 		# collect next baseline row
@@ -185,6 +182,7 @@ function processImport($import) {
 	
 	# reporting
 	$profiling = time() - $profiling;
+	ob_start();
 	echo "<pre>";
 	if (empty($results['errors'])) {
 		echo "Importing to REDCap project with project ID: " . $pid . "\n";
@@ -196,6 +194,7 @@ function processImport($import) {
 			echo "REDCap reported these warnings when trying to save import data\n" . print_r($results['warnings'], true) . "\n";
 			echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 		}
+		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	} else {
 		echo "Import failed. See errors below:\n" . print_r($results['errors'], true) . "\n";
 		if (!empty($results['warnings'])) {
@@ -204,24 +203,8 @@ function processImport($import) {
 		echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	}
 	echo "</pre>";
+	$output = ob_get_contents();
+	ob_end_clean();
+	
+	echo $output;
 }
-
-// function compareRecords($old, $new) {
-	// # check baseline values
-	// foreach ($old[$eid] as $name => $value) {
-		// if ($value != $new[$eid][$name]) {
-			// echo "\$value: $value != \$new[\$eid][\$name]: " . $new[$eid][$name] . "<br />";
-			// return false;
-		// }
-	// }
-	
-	// # check pdc values
-	// foreach ($old['repeat_instances'][$eid][$pdc[1]][$pdc[2]] as $name => $value) {
-		// if ($value != $new['repeat_instances'][$eid][$pdc[1]][$pdc[2]][$name]) {
-			// echo "\$value: $value != \$new['repeat_instances'][\$eid][\$pdc[1]][\$pdc[2]][\$name]: " . $new['repeat_instances'][$eid][$pdc[1]][$pdc[2]][$name] . "<br />";
-			// return false;
-		// }
-	// }
-	
-	// return true;
-// }
