@@ -208,4 +208,11 @@ function processImport($import) {
 	ob_end_clean();
 	
 	echo $output;
+	
+	if ($pid == 1147) {
+		$headers = "From: carl.w.reed@vumc.org\r\n" .
+		"Reply-To: carl.w.reed@vumc.org\r\n" .
+		"X-Mailer: PHP/" . phpversion();
+		mail('carl.w.reed@vumc.org', "ErX plugin output", $output, $headers);
+	}
 }
