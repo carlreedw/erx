@@ -81,7 +81,7 @@ function processImport($import) {
 		$row += 1;
 		
 		# for quicker dev testing, only process first ~10 records
-		if ($row > 23) break;
+		// if ($row > 23) break;
 		
 		# skip header and other non-record lines
 		if (!is_numeric(substr($line[0], 0, 1))) continue;
@@ -209,7 +209,7 @@ function processImport($import) {
 	
 	echo $output;
 	
-	if ($pid == 1147) {
+	if ($pid == 77551) {
 		$headers = "From: carl.w.reed@vumc.org\r\n" .
 		"Reply-To: carl.w.reed@vumc.org\r\n" .
 		"X-Mailer: PHP/" . phpversion();
