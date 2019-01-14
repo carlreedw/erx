@@ -27,6 +27,7 @@ $username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);
 $password = $matches[1];
 if(!$username or !$password or !$host){
+	die("\$credFilepath: $credFilepath");
 	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
 }
 use League\Flysystem\Filesystem;
