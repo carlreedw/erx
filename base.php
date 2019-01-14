@@ -10,7 +10,7 @@ if(!defined("ENVIRONMENT")) {
 			define("PID", 88279);	// test project on prod");
 		} elseif ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_DEV) {
 			define("ENVIRONMENT", "TEST");
-			define("PID", 1147);
+			define("PID", 1210);
 		}
 	} else {
 		define("ENVIRONMENT", "DEV");
