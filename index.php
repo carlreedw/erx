@@ -195,7 +195,7 @@ function processImport($import) {
 		echo "These (" . count($ignored) . ") records were ignored:\n" . print_r($ignored, true) . "\n";
 		if (!empty($results['warnings'])) {
 			echo "REDCap reported these warnings when trying to save import data\n" . print_r($results['warnings'], true) . "\n";
-			// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+			echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 		}
 		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	} else {
@@ -203,7 +203,7 @@ function processImport($import) {
 		if (!empty($results['warnings'])) {
 			echo "See warnings below:\n" . print_r($results['warnings'], true) . "\n";
 		}
-		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+		echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	}
 	echo "</pre>";
 	$output = ob_get_contents();
