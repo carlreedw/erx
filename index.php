@@ -13,14 +13,13 @@ require_once "../../redcap_connect.php";
 include_once('vendor/autoload.php');
 require_once "base.php";
 
-# for quicker testing on dev:
+// # for quicker testing on dev:
 // $filepath = "C:/vumc/plugins/erx/pdc_import-1-14.csv";
 // $csv = file_get_contents($filepath);
 
 # fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
-// $credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
 $credFilepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
 $creds = file_get_contents($credFilepath);
 preg_match('/user: (.+)$/m', $creds, $matches);
@@ -49,7 +48,9 @@ foreach($contents as $i => $file) {
 	}
 }
 
+# for copying import data to local and diagnostics
 // exit($csv);
+
 # process import file contents
 processImport($csv);
 
@@ -65,84 +66,47 @@ function processImport($import) {
 	$eid = $project->firstEventId;
 	$pid = PID;
 	
+	# for diagnostics
+	// die("<pre>" . print_r(\REDCap::getData(PID), true) . "</pre>");
+	
 	# $data is what we will send to redcap database
 	$data = [];
+	
 	# $ignored to keep track of which/why records ignored
 	$ignored = [];
 	
 	# separate import file's string data into lines
 	$imported = [];
-	$rows = count($rows);
 	$row = 0;
-	$baseline = false;
-	$pdc = false;
 	
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $import) as $line) {
 		# convert line string to csv array
 		$line = str_getcsv($line);
 		$row += 1;
 		
-		# for quicker dev testing, only process first ~10 records
-		// if ($row > 6) break;
+		# for quicker dev testing, only process first n rows
+		// if ($row == 16) break;
 		
 		# skip header and other non-record lines
-		if (!is_numeric(substr($line[0], 0, 1))) continue;
-		
-		# collect a baseline/pdc row pair
-		if ($line[1] == 'pdc_measurement' and $baseline) {
-			$pdc = $line;
-		} else {
-			$baseline = $line;
+		if (!is_numeric(substr($line[0], 0, 1))) { # header or trash/newline row
 			continue;
+		} elseif ($line[1] == 'pdc_measurement') { # pdc data row
+			$mode = 'pdc';
+			# convert dates
+			$line[3] = (new DateTime($line[3]))->format("Y-m-d");
+			$line[18] = (new DateTime($line[18]))->format("Y-m-d");
+			$line[19] = (new DateTime($line[19]))->format("Y-m-d");
+		} else { # baseline data row
+			$mode = 'baseline';
+			# convert dates
+			$line[6] = (new DateTime($line[6]))->format("Y-m-d");
 		}
 		
-// echo "<pre>" . print_r($baseline, true) . "</pre>";
-// echo "<pre>" . print_r($pdc, true) . "</pre>";
-// exit;
-		
-		# convert dates
-		$baseline[3] = (new DateTime($baseline[3]))->format("Y-m-d");
-		$baseline[6] = (new DateTime($baseline[6]))->format("Y-m-d");
-		$pdc[18] = (new DateTime($pdc[18]))->format("Y-m-d");
-		$pdc[19] = (new DateTime($pdc[19]))->format("Y-m-d");
-		
-		# get record_id for this pair of imported rows
-		$rid = $baseline[0];
-		
-		$newRecord = [
-			$eid => [
-				"import_date" => $baseline[3],
-				"mrn_gpi" => $baseline[4],
-				"sex" => $baseline[5],
-				"date_birth" => $baseline[6],
-				"insurance" => $baseline[8],
-				"oop" => $baseline[9],
-				"zip" => $baseline[10],
-				"med_name" => $baseline[11],
-				"clinic" => $baseline[12],
-				"clinic_level" => $baseline[13],
-				"vsp_pat" => $baseline[14]
-			],
-			"repeat_instances" => [
-				$eid => [
-					# "pdc_measurement"
-					$pdc[1] => [
-						# 1 or int
-						$pdc[2] => [
-							"last_fill_date" => $$pdc[18],
-							"measure_date" => $pdc[19],
-							"gap_days" => $pdc[20],
-							"pdc_measurement_4mths" => $pdc[21],
-							"pdc_measurement_12mths" => $pdc[22],
-						]
-					]
-				]
-			]
-		];
-		
-		# get record's existing data if applicable
+		# get record id
+		$rid = $line[0];
 		$recordData = \REDCap::getData($pid, 'array', $rid);
 		
+		# should we ignore?
 		$saveNeeded = true;
 		if (!empty($recordData)) {
 			# if already randomized, or newer data present, don't save
@@ -152,21 +116,55 @@ function processImport($import) {
 				$ignored[$rid] = "randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
 			
-			# if last_fill_date > import_data, don't save
-			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$pdc[1]][$pdc[2]]["last_fill_date"];
-			if ($existingFillDate >= $pdc[18]) {
-				$saveNeeded = false;
-				$ignored[$rid] = "existing last_fill_date (" . $existingFillDate . ") is >= import_date (" . $baseline[3].")";
+			if ($mode == 'pdc') {
+				// die("<pre>" . print_r(array($recordData[$rid]["repeat_instances"][$eid][$line[1]][$line[2]]["last_fill_date"], $line[18]), true) . "</pre>");
+				# if last_fill_date > import_data, don't save
+				$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[1]][$line[2]]["last_fill_date"];
+				if ($existingFillDate >= $line[18]) {
+					$saveNeeded = false;
+					$ignored[$rid][$line[2]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[18].") for this PDC data";
+				}
 			}
 		}
 		
-		if ($saveNeeded) {
-			$data[$rid] = $newRecord;
+		if ($saveNeeded === true) {
+			if ($mode == 'pdc') {
+				$data[$rid]['repeat_instances'][$eid][$line[1]][$line[2]] = [
+					"import_date" => $line[3],
+					"mrn_gpi" => $line[4],
+					"oop" => $line[9],
+					"med_name" => $line[11],
+					"clinic" => $line[12],
+					"clinic_level" => $line[13],
+					"last_fill_date" => $line[18],
+					"measure_date" => $line[19],
+					"gap_days" => $line[20],
+					"pdc_measurement_4mths" => $line[21],
+					"pdc_measurement_12mths" => $line[22]
+				];
+			} elseif ($mode == 'baseline') {
+				$data[$rid] = [];
+				$data[$rid]["repeat_instances"] = [];
+				$data[$rid][$eid] = [
+					"mrn" => $rid,
+					"sex" => $line[5],
+					"date_birth" => $line[6],
+					"insurance" => $line[8],
+					"zip" => $line[10],
+					"vsp_pat" => $line[14],
+					"vumc_employee" => $line[16]
+				];
+			}
 		}
 		
-		# collect next baseline row
-		$baseline = false;
-		$pdc = false;
+		$line = null;
+	}
+	
+	# if all PDC entries ignored, ignore baseline too
+	foreach ($data as $rid => $record) {
+		if (empty($record["repeat_instances"])) {
+			unset($data[$rid]);
+		}
 	}
 	
 	# save data to REDCap db
@@ -195,7 +193,6 @@ function processImport($import) {
 		echo "These (" . count($ignored) . ") records were ignored:\n" . print_r($ignored, true) . "\n";
 		if (!empty($results['warnings'])) {
 			echo "REDCap reported these warnings when trying to save import data\n" . print_r($results['warnings'], true) . "\n";
-			echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 		}
 		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	} else {
@@ -203,7 +200,7 @@ function processImport($import) {
 		if (!empty($results['warnings'])) {
 			echo "See warnings below:\n" . print_r($results['warnings'], true) . "\n";
 		}
-		echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	}
 	echo "</pre>";
 	$output = ob_get_contents();
