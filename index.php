@@ -20,15 +20,16 @@ require_once "base.php";
 # fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
-$credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
+// $credFilepath = substr(APP_PATH_DOCROOT, 0, strpos(APP_PATH_DOCROOT, 'www')) . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
+$credFilepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
+if (!file_exists($credFilepath)) die("The ErX couldn't find the file that holds SFTP credentials for the Adherence Intervention Study. Missing file: $credFilepath");
 $creds = file_get_contents($credFilepath);
 preg_match('/user: (.+)$/m', $creds, $matches);
 $username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);
 $password = $matches[1];
 if(!$username or !$password or !$host){
-	die("\$credFilepath: $credFilepath");
-	die("The ErX plugin was not able to find the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
+	die("The ErX plugin was not able to determine the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
 }
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
