@@ -14,7 +14,7 @@ include_once('vendor/autoload.php');
 require_once "base.php";
 
 # for quicker testing on dev:
-// $filepath = "C:/pdc_redcap_import.csv";
+// $filepath = "C:/vumc/plugins/erx/pdc_import-1-14.csv";
 // $csv = file_get_contents($filepath);
 
 # fetch data to be imported from SFTP server and process it
@@ -48,6 +48,7 @@ foreach($contents as $i => $file) {
 	}
 }
 
+// exit($csv);
 # process import file contents
 processImport($csv);
 
@@ -81,7 +82,7 @@ function processImport($import) {
 		$row += 1;
 		
 		# for quicker dev testing, only process first ~10 records
-		// if ($row > 23) break;
+		// if ($row > 6) break;
 		
 		# skip header and other non-record lines
 		if (!is_numeric(substr($line[0], 0, 1))) continue;
@@ -147,7 +148,7 @@ function processImport($import) {
 			# see if randomized by checking baseline.confirm and baseline.randomization_complete
 			if ($recordData[$rid][$eid]["confirm"] == 1 && $recordData[$rid][$eid]["randomization_complete"] == 2) {
 				$saveNeeded = false;
-				$ignored[$rid] = "randomized already / confirm = 1 and randomization_complete = 2";
+				$ignored[$rid] = "randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
 			
 			# if last_fill_date > import_data, don't save
