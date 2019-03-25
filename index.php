@@ -17,6 +17,8 @@ require_once "base.php";
 // $filepath = "C:/vumc/plugins/erx/pdc_import-1-14.csv";
 // $csv = file_get_contents($filepath);
 
+\REDCap::logEvent('Running ERX plugin', null, null, null, null, PID);
+
 # fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
@@ -117,7 +119,6 @@ function processImport($import) {
 			}
 			
 			if ($mode == 'pdc') {
-				// die("<pre>" . print_r(array($recordData[$rid]["repeat_instances"][$eid][$line[1]][$line[2]]["last_fill_date"], $line[18]), true) . "</pre>");
 				# if last_fill_date > import_data, don't save
 				$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[1]][$line[2]]["last_fill_date"];
 				if ($existingFillDate >= $line[18]) {
