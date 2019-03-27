@@ -14,12 +14,6 @@ if (file_exists("base.php")) {
 } else {
 	require_once "/app001/www/redcap/plugins/erx/base.php";
 }
-echo("<pre>");
-echo(CREDENTIALS_PATH . "\n");
-echo(RC_CONNECT_PATH . "\n");
-echo(AUTOLOAD_PATH . "\n");
-echo("</pre>");
-exit();
 // require_once "../../redcap_connect.php";
 require_once RC_CONNECT_PATH;
 // include_once('vendor/autoload.php');
