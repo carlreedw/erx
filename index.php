@@ -9,9 +9,21 @@
 $profiling = time();
 
 # includes
-require_once "../../redcap_connect.php";
-include_once('vendor/autoload.php');
-require_once "base.php";
+if (file_exists("base.php")) {
+	require_once "base.php";
+} else {
+	require_once "/app001/www/redcap/plugins/erx/base.php";
+}
+echo("<pre>");
+echo(CREDENTIALS_PATH . "\n");
+echo(RC_CONNECT_PATH . "\n");
+echo(AUTOLOAD_PATH . "\n");
+echo("</pre>");
+exit();
+// require_once "../../redcap_connect.php";
+require_once RC_CONNECT_PATH;
+// include_once('vendor/autoload.php');
+include_once AUTOLOAD_PATH;
 
 // # for quicker testing on dev:
 // $filepath = "C:/vumc/plugins/erx/pdc_import-1-14.csv";
@@ -22,8 +34,8 @@ require_once "base.php";
 # fetch data to be imported from SFTP server and process it
 $host = 'sftp.vumc.org';
 $port = 22;
-$credFilepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
-$creds = file_get_contents($credFilepath);
+// $credFilepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
+$creds = file_get_contents(CREDENTIALS_PATH);
 preg_match('/user: (.+)$/m', $creds, $matches);
 $username = substr($matches[1], 0, 7);
 preg_match('/passwd: (.*)$/', $creds, $matches);

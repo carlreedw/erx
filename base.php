@@ -12,9 +12,15 @@ if(!defined("ENVIRONMENT")) {
 			define("ENVIRONMENT", "TEST");
 			define("PID", 1210);
 		}
+		define("CREDENTIALS_PATH", "/app001/credentials/adherence.txt");
+		define("RC_CONNECT_PATH", "/app001/www/redcap/redcap_connect.php");
+		define("AUTOLOAD_PATH", "/app001/www/redcap/plugins/erx/vendor/autoload.php");
 	} else {
 		define("ENVIRONMENT", "DEV");
 		// define("PID", 14);	// @able
+		define("CREDENTIALS_PATH", "C:\\xampp\\credentials\\adherence.txt");
+		define("RC_CONNECT_PATH", "C:\\xampp\\htdocs\\redcap\\redcap_connect.php");
+		define("AUTOLOAD_PATH", "C:\\xampp\\htdocs\\redcap\\plugins\\erx\\vendor\\autoload.php");
 		define("PID", 31);
 	}
 }
