@@ -6,8 +6,8 @@ if(!defined("ENVIRONMENT")) {
 
 		if ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_PROD) {
 			define("ENVIRONMENT", "PROD");
-			// define("PID", 77551);
-			define("PID", 88279);	// test project on prod");
+			define("PID", 77551);
+			// define("PID", 88279);	// test project on prod");
 		} elseif ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_DEV) {
 			define("ENVIRONMENT", "TEST");
 			define("PID", 1210);
@@ -15,6 +15,6 @@ if(!defined("ENVIRONMENT")) {
 	} else {
 		define("ENVIRONMENT", "DEV");
 		// define("PID", 14);	// @able
-		define("PID", 18);
+		define("PID", 31);
 	}
 }
