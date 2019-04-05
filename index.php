@@ -131,27 +131,39 @@ function processImport($import) {
 		$mrn = $line[1];
 		$recordDataParams = [
 			'project_id' => $pid,
-			'filterLogic' => "[mrn]=$mrn"
+			'filterLogic' => "[mrn]=\"$mrn\""
 		];
 		$recordData = \REDCap::getData($recordDataParams);
+		// re-fetching by rid is necessary to capture repeated instances data
+		$foundRecordID = current($recordData)[$eid]['record_id'];
+		$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
+		
+		// echo("<pre>");
+		// echo("recordDataParams:\n");
+		// print_r($recordData);
+		// echo("\$rid: $rid");
+		// echo("\n");
+		// print_r($recordData);
+		// echo("</pre>");
+		// exit();
+		
 		// should we ignore?
 		$saveNeeded = true;
 		if (!empty($recordData)) {
 			// if already randomized, or newer data present, don't save
 			// see if randomized by checking baseline.confirm and baseline.randomization_complete
-			$record = current($recordData);
+			$record = $recordData[$foundRecordID];
+			
 			if ($record[$eid]["confirm"] == 1 && $record[$eid]["randomization_complete"] == 2) {
 				$saveNeeded = false;
 				$ignored[$rid] = "randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
 			
-			if ($mode == 'pdc') {
-				# if last_fill_date > import_data, don't save
-				$existingFillDate = $record["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
-				if ($existingFillDate >= $line[17]) {
-					$saveNeeded = false;
-					$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
-				}
+			# if last_fill_date > import_data, don't save
+			$existingFillDate = $record["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
+			if ($existingFillDate >= $line[17]) {
+				$saveNeeded = false;
+				$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
 			}
 		}
 		
@@ -159,6 +171,7 @@ function processImport($import) {
 			$data[$rid] = [];
 			$data[$rid]["repeat_instances"] = [];
 			$data[$rid][$eid] = [
+				"mrn" => $mrn,
 				"import_date" => $line[4],
 				"mrn_gpi" => $line[5],
 				"med_name" => $line[6],
@@ -178,25 +191,17 @@ function processImport($import) {
 				"pdc_measurement_4mths" => $line[20],
 				"pdc_measurement_12mths" => $line[21]
 			];
-			$rid++;
 		}
-		
+		$rid++;
 		$line = null;
 	}
-		
-		// if ($lineIndex >= 12) {
-		// echo("<pre>");
-		// print_r($data);
-		// echo("</pre>");
-		// exit();
-		// }
 	
 	# if all PDC entries ignored, ignore baseline too
-	foreach ($data as $rid => $record) {
-		if (empty($record["repeat_instances"])) {
-			unset($data[$rid]);
-		}
-	}
+	// foreach ($data as $rid => $record) {
+		// if (empty($record["repeat_instances"])) {
+			// unset($data[$rid]);
+		// }
+	// }
 	
 	# save data to REDCap db
 	$results = \REDCap::saveData(
