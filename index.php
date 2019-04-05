@@ -75,6 +75,7 @@ function processImport($import) {
 	$project = new \Project(PID);
 	$eid = $project->firstEventId;
 	$pid = PID;
+	$rid = 1;
 	
 	# for diagnostics
 	// die("<pre>" . print_r(\REDCap::getData(PID), true) . "</pre>");
@@ -97,115 +98,98 @@ function processImport($import) {
 		# for quicker dev testing, only process first n rows
 		// if ($lineIndex == 16) break;
 		
-		# skip header and other non-record lines
-		if (!is_numeric(substr($line[0], 0, 1))) { # header or trash/newline row
-			continue;
-		} elseif ($line[1] == 'pdc_measurement') { # pdc data row
-			$mode = 'pdc';
-			// convert dates
-			$line[3] = (new DateTime($line[3]))->format("Y-m-d");
-			// $line[18] = (new DateTime($line[18]))->format("Y-m-d");
-			$line[16] = (new DateTime($line[16]))->format("Y-m-d");
-			// $line[19] = (new DateTime($line[19]))->format("Y-m-d");
-			$line[17] = (new DateTime($line[17]))->format("Y-m-d");
-		} else { # baseline data row
+		// skip header row
+		if ($lineIndex == 0) continue;
+		
+		// add pdc measurement information to baseline info $line
+		if (is_numeric($line[1])) {
 			$mode = 'baseline';
 			$nextLine = $lines[$lineIndex+1];
-			
-			// echo("<pre>");
-			// print_r($nextLine);
-			// echo("</pre>");
-			// exit();
-			
-			$line[3] = (new DateTime($nextLine[3]))->format("Y-m-d");
-			$line[8] = (new DateTime($line[8]))->format("Y-m-d");
-			$line[4] = $nextLine[4];
-			$line[5] = $nextLine[5];
-			$line[6] = $nextLine[6];
-			$line[11] = $nextLine[11];
-			$line[13] = $nextLine[13];
-			// calculated fields should not be included
-			// $line[15] = $nextLine[15];
+			for ($i = 0; $i <= 21; $i++) {
+				if ($line[$i] == null) $line[$i] = $lines[$lineIndex+1][$i];
+			}
+		} else {
+			continue;
 		}
 		
-		# get record id
-		$rid = $line[0];
-		$recordData = \REDCap::getData($pid, 'array', $rid);
-		# should we ignore?
+		// convert dates
+		if ($line[4]) $line[4] = (new DateTime($line[4]))->format("Y-m-d");
+		if ($line[9]) $line[9] = (new DateTime($line[9]))->format("Y-m-d");
+		if ($line[17]) $line[17] = (new DateTime($line[17]))->format("Y-m-d");
+		if ($line[18]) $line[18] = (new DateTime($line[18]))->format("Y-m-d");
+		
+		# skip header and other non-record lines
+		// if ($line[2] == 'pdc_measurement') { # pdc data row
+			// $mode = 'pdc';
+			// convert dates
+			// $line[4] = (new DateTime($line[4]))->format("Y-m-d");
+			// $line[17] = (new DateTime($line[17]))->format("Y-m-d");
+			// $line[18] = (new DateTime($line[18]))->format("Y-m-d");
+		// } elseif (is_numeric($line[1])) { # baseline data row
+		
+		// see if this data is already in REDCap project
+		$mrn = $line[1];
+		$recordDataParams = [
+			'project_id' => $pid,
+			'filterLogic' => "[mrn]=$mrn"
+		];
+		$recordData = \REDCap::getData($recordDataParams);
+		// should we ignore?
 		$saveNeeded = true;
 		if (!empty($recordData)) {
-			# if already randomized, or newer data present, don't save
-			# see if randomized by checking baseline.confirm and baseline.randomization_complete
-			if ($recordData[$rid][$eid]["confirm"] == 1 && $recordData[$rid][$eid]["randomization_complete"] == 2) {
+			// if already randomized, or newer data present, don't save
+			// see if randomized by checking baseline.confirm and baseline.randomization_complete
+			$record = current($recordData);
+			if ($record[$eid]["confirm"] == 1 && $record[$eid]["randomization_complete"] == 2) {
 				$saveNeeded = false;
 				$ignored[$rid] = "randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
 			
 			if ($mode == 'pdc') {
 				# if last_fill_date > import_data, don't save
-				$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[1]][$line[2]]["last_fill_date"];
-				if ($existingFillDate >= $line[16]) {
+				$existingFillDate = $record["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
+				if ($existingFillDate >= $line[17]) {
 					$saveNeeded = false;
-					$ignored[$rid][$line[2]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[16].") for this PDC data";
+					$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
 				}
 			}
 		}
 		
 		if ($saveNeeded === true) {
-			if ($mode == 'pdc') {
-				$data[$rid]['repeat_instances'][$eid][$line[1]][$line[2]] = [
-					"last_fill_date" => $line[16],
-					"measure_date" => $line[17],
-					"gap_days" => $line[18],
-					"pdc_measurement_4mths" => $line[19],
-					"pdc_measurement_12mths" => $line[20]
-					
-					// "oop" => $line[11],
-					// // "last_fill_date" => $line[18],
-					// "last_fill_date" => $line[16],
-					// // "measure_date" => $line[19],
-					// "measure_date" => $line[17],
-					// // "gap_days" => $line[20],
-					// "gap_days" => $line[18],
-					// // "pdc_measurement_4mths" => $line[21],
-					// "pdc_measurement_4mths" => $line[19],
-					// // "pdc_measurement_12mths" => $line[22]
-					// "pdc_measurement_12mths" => $line[20]
-				];
-			} elseif ($mode == 'baseline') {
-				$data[$rid] = [];
-				$data[$rid]["repeat_instances"] = [];
-				$data[$rid][$eid] = [
-					"import_date" => $line[3],
-					"mrn_gpi" => $line[4],
-					"med_name" => $line[5],
-					"clinic" => $line[6],
-					"sex" => $line[7],
-					"date_birth" => $line[8],
-					// don't include calculated fields
-					// "age" => $line[9],
-					"insurance" => $line[10],
-					"oop" => $line[11],
-					"zip" => $line[12],
-					"clinic_level" => $line[13],
-					"vsp_pat" => $line[14],
-					// "inclusion_pdc" => $line[15]
-					
-					// "mrn" => $rid,
-					// "sex" => $line[5],
-					// "date_birth" => $line[6],
-					// "insurance" => $line[8],
-					// "oop" => $line[9],
-					// "zip" => $line[10],
-					// "med_name" => $line[11],
-					// "clinic" => $line[12],
-					// "vumc_employee" => $line[16]
-				];
-			}
+			$data[$rid] = [];
+			$data[$rid]["repeat_instances"] = [];
+			$data[$rid][$eid] = [
+				"import_date" => $line[4],
+				"mrn_gpi" => $line[5],
+				"med_name" => $line[6],
+				"clinic" => $line[7],
+				"sex" => $line[8],
+				"date_birth" => $line[9],
+				"insurance" => $line[11],
+				"oop" => $line[12],
+				"zip" => $line[13],
+				"clinic_level" => $line[14],
+				"vsp_pat" => $line[15]
+			];
+			$data[$rid]['repeat_instances'][$eid][$line[2]][$line[3]] = [
+				"last_fill_date" => $line[17],
+				"measure_date" => $line[18],
+				"gap_days" => $line[19],
+				"pdc_measurement_4mths" => $line[20],
+				"pdc_measurement_12mths" => $line[21]
+			];
+			$rid++;
 		}
 		
 		$line = null;
 	}
+		
+		// if ($lineIndex >= 12) {
+		// echo("<pre>");
+		// print_r($data);
+		// echo("</pre>");
+		// exit();
+		// }
 	
 	# if all PDC entries ignored, ignore baseline too
 	foreach ($data as $rid => $record) {
@@ -247,7 +231,7 @@ function processImport($import) {
 		if (!empty($results['warnings'])) {
 			echo "See warnings below:\n" . print_r($results['warnings'], true) . "\n";
 		}
-		// echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
+		echo "Here is the data sent to REDCap:\n" . print_r($data, true) . "\n";
 	}
 	echo "</pre>";
 	$output = ob_get_contents();
