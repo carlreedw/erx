@@ -147,30 +147,31 @@ function processImport($import) {
 		$recordData = \REDCap::getData($recordDataParams);
 		
 		// print_r($recordData);
-		echo("\n");
-		echo("eid: $eid\n");
+		// echo("\n");
+		// echo("eid: $eid\n");
 		
 		// re-fetching by rid is necessary to capture repeated instances data
-		$foundRecordID = $recordData[1][$eid]['record_id'];
+		// $foundRecordID = $recordData[1][$eid]['record_id'];
+		$foundRecordID = array_key_first($recordData);
 		if (isset($foundRecordID)) {
 			$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
 		}
 		
 		// echo("<pre>");
 		// echo("recordDataParams:\n");
-		echo("found record ID: " . $foundRecordID . "\n");
-		print_r($recordData);
+		// echo("found record ID: " . $foundRecordID . "\n");
+		// print_r($recordData);
 		// echo("\$rid: $rid");
 		// echo("\n");
 		// print_r($recordData);
-		echo("</pre>");
-		exit();
+		// echo("</pre>");
+		// exit();
 		
 		// should we ignore?
 		$saveNeeded = true;
 		if (!empty($recordData)) {
 			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
-			echo("record data found for RID: $foundRecordID\r\n");
+			// echo("record data found for RID: $foundRecordID\r\n");
 			// if already randomized, or newer data present, don't save
 			// see if randomized by checking baseline.confirm and baseline.randomization_complete
 			$record = $recordData[$foundRecordID];
