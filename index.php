@@ -179,7 +179,7 @@ function processImport($import) {
 			if ($record[$eid]["confirm"] == 1 && $record[$eid]["randomization_complete"] == 2) {
 				localLog("	This patient has been randomized.");
 				$saveNeeded = false;
-				$ignored[$rid] = "--Patient randomized already: [confirm] = 1, [randomization_complete] == 2";
+				$ignored[$rid] = "-e- Patient randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
 			
 			# if last_fill_date > import_data, don't save
