@@ -146,8 +146,9 @@ function processImport($import) {
 		];
 		$recordData = \REDCap::getData($recordDataParams);
 		
-		print_r($recordData);
+		// print_r($recordData);
 		echo("\n");
+		echo("eid: $eid\n");
 		
 		// re-fetching by rid is necessary to capture repeated instances data
 		$foundRecordID = current($recordData)[$eid]['record_id'];
