@@ -160,6 +160,7 @@ function processImport($import) {
 		$saveNeeded = true;
 		if (!empty($recordData)) {
 			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
+			echo("record data found for RID: $foundRecordID\r\n");
 			// if already randomized, or newer data present, don't save
 			// see if randomized by checking baseline.confirm and baseline.randomization_complete
 			$record = $recordData[$foundRecordID];
