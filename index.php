@@ -16,8 +16,6 @@ if (file_exists("base.php")) {
 }
 require_once RC_CONNECT_PATH;
 include_once AUTOLOAD_PATH;
-// use League\Flysystem\Filesystem;
-// use League\Flysystem\Sftp\SftpAdapter;
 
 file_put_contents('log.txt', "new log\r\n");
 
@@ -129,15 +127,6 @@ function processImport($import) {
 		if ($line[17]) $line[17] = (new DateTime($line[17]))->format("Y-m-d");
 		if ($line[18]) $line[18] = (new DateTime($line[18]))->format("Y-m-d");
 		
-		# skip header and other non-record lines
-		// if ($line[2] == 'pdc_measurement') { # pdc data row
-			// $mode = 'pdc';
-			// convert dates
-			// $line[4] = (new DateTime($line[4]))->format("Y-m-d");
-			// $line[17] = (new DateTime($line[17]))->format("Y-m-d");
-			// $line[18] = (new DateTime($line[18]))->format("Y-m-d");
-		// } elseif (is_numeric($line[1])) { # baseline data row
-		
 		// see if this data is already in REDCap project
 		$mrn = $line[1];
 		$recordDataParams = [
@@ -146,26 +135,11 @@ function processImport($import) {
 		];
 		$recordData = \REDCap::getData($recordDataParams);
 		
-		// print_r($recordData);
-		// echo("\n");
-		// echo("eid: $eid\n");
-		
 		// re-fetching by rid is necessary to capture repeated instances data
-		// $foundRecordID = $recordData[1][$eid]['record_id'];
 		$foundRecordID = array_keys($recordData)[0];
 		if (isset($foundRecordID)) {
 			$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
 		}
-		
-		// echo("<pre>");
-		// echo("recordDataParams:\n");
-		// echo("found record ID: " . $foundRecordID . "\n");
-		// print_r($recordData);
-		// echo("\$rid: $rid");
-		// echo("\n");
-		// print_r($recordData);
-		// echo("</pre>");
-		// exit();
 		
 		// should we ignore?
 		$saveNeeded = true;
