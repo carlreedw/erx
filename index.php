@@ -17,16 +17,28 @@ if (file_exists("base.php")) {
 require_once RC_CONNECT_PATH;
 include_once AUTOLOAD_PATH;
 
-file_put_contents('log.txt', "new log\r\n");
+$projectRecordList = \Records::getRecordList(PID);
+function getNextRecordID() {
+	global $projectRecordList;
+	$rid = 1;
+	while (true) {
+		if(!isset($projectRecordList[$rid])) {
+			$projectRecordList[$rid] = strval($rid);
+			return $projectRecordList[$rid];
+		}
+		$rid++;
+	}
+}
 
+file_put_contents('log.txt', "new log\r\n");
 function localLog($txt) {
 	file_put_contents('log.txt', $txt . "\r\n", FILE_APPEND);
 }
 
-$useLocalImportFile = false;
+// $useLocalImportFile = true;
 if ($useLocalImportFile) {
 	// for quicker testing on dev:
-	$filepath = "C:/vumc/plugins/erx/testImport1.csv";
+	$filepath = "C:/vumc/plugins/erx/new_pdc_import 4-16.csv";
 	$csv = file_get_contents($filepath);
 	
 	localLog("Pulling test import from filepath: $filepath");
@@ -68,7 +80,7 @@ if ($useLocalImportFile) {
 	}
 }
 
-echo("<pre>");
+// echo("<pre>");
 
 // process import file contents
 processImport($csv);
@@ -84,7 +96,6 @@ function processImport($import) {
 	$project = new \Project(PID);
 	$eid = $project->firstEventId;
 	$pid = PID;
-	$rid = 1;
 	
 	# for diagnostics
 	// die("<pre>" . print_r(\REDCap::getData(PID), true) . "</pre>");
@@ -99,6 +110,7 @@ function processImport($import) {
 	$imported = [];
 	$lines = [];
 	
+	$rid = 1;
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $import) as $line) {
 		// convert line string to csv array
 		$lines[] = str_getcsv($line);
@@ -135,8 +147,15 @@ function processImport($import) {
 		];
 		$recordData = \REDCap::getData($recordDataParams);
 		
+		if (empty($recordData)) {
+			localLog("No record data found for MRN: $mrn");
+		} else {
+			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
+		}
+		
 		// re-fetching by rid is necessary to capture repeated instances data
 		$foundRecordID = array_keys($recordData)[0];
+		
 		if (isset($foundRecordID)) {
 			$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
 		}
@@ -169,20 +188,22 @@ function processImport($import) {
 			localLog("	Adding record data to be saved to REDCap project");
 			$data[$rid] = [];
 			$data[$rid]["repeat_instances"] = [];
-			$data[$rid][$eid] = [
-				"mrn" => $mrn,
-				"import_date" => $line[4],
-				"mrn_gpi" => $line[5],
-				"med_name" => $line[6],
-				"clinic" => $line[7],
-				"sex" => $line[8],
-				"date_birth" => $line[9],
-				"insurance" => $line[11],
-				"oop" => $line[12],
-				"zip" => $line[13],
-				"clinic_level" => $line[14],
-				"vsp_pat" => $line[15]
-			];
+			if (empty($recordData)) {
+				$data[$rid][$eid] = [
+					"mrn" => $mrn,
+					"import_date" => $line[4],
+					"mrn_gpi" => $line[5],
+					"med_name" => $line[6],
+					"clinic" => $line[7],
+					"sex" => $line[8],
+					"date_birth" => $line[9],
+					"insurance" => $line[11],
+					"oop" => $line[12],
+					"zip" => $line[13],
+					"clinic_level" => $line[14],
+					"vsp_pat" => $line[15]
+				];
+			}
 			$data[$rid]['repeat_instances'][$eid][$line[2]][$line[3]] = [
 				"last_fill_date" => $line[17],
 				"measure_date" => $line[18],
