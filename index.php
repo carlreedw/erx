@@ -131,7 +131,7 @@ function processImport($import) {
 		$mrn = $line[1];
 		$recordDataParams = [
 			'project_id' => $pid,
-			'filterLogic' => "[mrn]=\"$mrn\""
+			'filterLogic' => "[mrn]=\"$mrn\" or [mrn_gpi]=\"" . $line[5] . "\""
 		];
 		$recordData = \REDCap::getData($recordDataParams);
 		
