@@ -221,15 +221,6 @@ function processImport($import) {
 		$line = null;
 	}
 	
-	echo("</pre>");
-	
-	# if all PDC entries ignored, ignore baseline too
-	// foreach ($data as $rid => $record) {
-		// if (empty($record["repeat_instances"])) {
-			// unset($data[$rid]);
-		// }
-	// }
-	
 	# save data to REDCap db
 	$results = \REDCap::saveData(
 		$project_id = $pid,
