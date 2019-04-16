@@ -14,54 +14,63 @@ if (file_exists("base.php")) {
 } else {
 	require_once "/app001/www/redcap/plugins/erx/base.php";
 }
-// require_once "../../redcap_connect.php";
 require_once RC_CONNECT_PATH;
-// include_once('vendor/autoload.php');
 include_once AUTOLOAD_PATH;
+use \League\Flysystem\Filesystem;
+use \League\Flysystem\Sftp\SftpAdapter;
 
-// # for quicker testing on dev:
-// $filepath = "C:/vumc/plugins/erx/pdc_import-1-14.csv";
-// $csv = file_get_contents($filepath);
+file_put_contents('log.txt', "new log\r\n");
 
-\REDCap::logEvent('Running ERX plugin', null, null, null, null, PID);
-
-# fetch data to be imported from SFTP server and process it
-$host = 'sftp.vumc.org';
-$port = 22;
-// $credFilepath = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . DIRECTORY_SEPARATOR . 'credentials' . DIRECTORY_SEPARATOR . 'adherence.txt';
-$creds = file_get_contents(CREDENTIALS_PATH);
-preg_match('/user: (.+)$/m', $creds, $matches);
-$username = substr($matches[1], 0, 7);
-preg_match('/passwd: (.*)$/', $creds, $matches);
-$password = $matches[1];
-if(!$username or !$password or !$host){
-	die("The ErX plugin on " . gethostname() . " was not able to determine the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
+function localLog($txt) {
+	file_put_contents('log.txt', $txt . "\r\n", FILE_APPEND);
 }
-use League\Flysystem\Filesystem;
-use League\Flysystem\Sftp\SftpAdapter;
-$filesystem = new Filesystem(new SftpAdapter([
-    'host' => $host,
-    'port' => $port,
-    'username' => $username,
-    'password' => $password,
-    'privateKey' => null,
-    'root' => '/files/',
-    'timeout' => 10,
-]));
-$importFilename = 'pdc_redcap_import.csv';
-$contents = $filesystem->listContents(".", true);
-foreach($contents as $i => $file) {
-	if($file['path'] == $importFilename){
-		$csv = $filesystem->read($file['path']);
-		// file_put_contents("C:/temp/new_pdc_import.csv", $csv);
-		// exit();
+
+$useLocalImportFile = false;
+if ($useLocalImportFile) {
+	// for quicker testing on dev:
+	$filepath = "C:/vumc/plugins/erx/testImport1.csv";
+	$csv = file_get_contents($filepath);
+	
+	localLog("Pulling test import from filepath: $filepath");
+	
+	// for diagnostics
+	// exit($csv);
+} else {
+	\REDCap::logEvent('Running ERX plugin', null, null, null, null, PID);
+
+	// fetch data to be imported from SFTP server and process it
+	$host = 'sftp.vumc.org';
+	$port = 22;
+	$creds = file_get_contents(CREDENTIALS_PATH);
+	preg_match('/user: (.+)$/m', $creds, $matches);
+	$username = substr($matches[1], 0, 7);
+	preg_match('/passwd: (.*)$/', $creds, $matches);
+	$password = $matches[1];
+	if(!$username or !$password or !$host){
+		die("The ErX plugin on " . gethostname() . " was not able to determine the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
+	}
+	$filesystem = new \Filesystem(new SftpAdapter([
+		'host' => $host,
+		'port' => $port,
+		'username' => $username,
+		'password' => $password,
+		'privateKey' => null,
+		'root' => '/files/',
+		'timeout' => 10,
+	]));
+	$importFilename = 'pdc_redcap_import.csv';
+
+	$contents = $filesystem->listContents(".", true);
+	foreach($contents as $i => $file) {
+		if($file['path'] == $importFilename){
+			$csv = $filesystem->read($file['path']);
+			file_put_contents("C:/temp/new_pdc_import.csv", $csv);
+			exit();
+		}
 	}
 }
 
-# for copying import data to local and diagnostics
-// exit($csv);
-
-# process import file contents
+// process import file contents
 processImport($csv);
 
 function processImport($import) {
@@ -150,11 +159,13 @@ function processImport($import) {
 		// should we ignore?
 		$saveNeeded = true;
 		if (!empty($recordData)) {
+			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
 			// if already randomized, or newer data present, don't save
 			// see if randomized by checking baseline.confirm and baseline.randomization_complete
 			$record = $recordData[$foundRecordID];
 			
 			if ($record[$eid]["confirm"] == 1 && $record[$eid]["randomization_complete"] == 2) {
+				localLog("	This patient has been randomized.");
 				$saveNeeded = false;
 				$ignored[$rid] = "randomized already: [confirm] = 1, [randomization_complete] == 2";
 			}
@@ -162,12 +173,14 @@ function processImport($import) {
 			# if last_fill_date > import_data, don't save
 			$existingFillDate = $record["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
 			if ($existingFillDate >= $line[17]) {
+				localLog("	Last fill date >= import's last fill date.");
 				$saveNeeded = false;
 				$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
 			}
 		}
 		
 		if ($saveNeeded === true) {
+			localLog("	Adding record data to be saved to REDCap project");
 			$data[$rid] = [];
 			$data[$rid]["repeat_instances"] = [];
 			$data[$rid][$eid] = [
