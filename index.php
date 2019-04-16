@@ -16,8 +16,8 @@ if (file_exists("base.php")) {
 }
 require_once RC_CONNECT_PATH;
 include_once AUTOLOAD_PATH;
-use \League\Flysystem\Filesystem;
-use \League\Flysystem\Sftp\SftpAdapter;
+// use League\Flysystem\Filesystem;
+// use League\Flysystem\Sftp\SftpAdapter;
 
 file_put_contents('log.txt', "new log\r\n");
 
@@ -49,7 +49,7 @@ if ($useLocalImportFile) {
 	if(!$username or !$password or !$host){
 		die("The ErX plugin on " . gethostname() . " was not able to determine the correct SFTP credentials for the Adherence Intervention Study project. Please contact datacore@vumc.org.");
 	}
-	$filesystem = new \Filesystem(new SftpAdapter([
+	$filesystem = new \League\Flysystem\Filesystem(new \League\Flysystem\Sftp\SftpAdapter([
 		'host' => $host,
 		'port' => $port,
 		'username' => $username,
@@ -64,8 +64,8 @@ if ($useLocalImportFile) {
 	foreach($contents as $i => $file) {
 		if($file['path'] == $importFilename){
 			$csv = $filesystem->read($file['path']);
-			file_put_contents("C:/temp/new_pdc_import.csv", $csv);
-			exit();
+			// file_put_contents("C:/temp/new_pdc_import.csv", $csv);
+			// exit();
 		}
 	}
 }
