@@ -70,6 +70,8 @@ if ($useLocalImportFile) {
 	}
 }
 
+echo("<pre>");
+
 // process import file contents
 processImport($csv);
 
@@ -143,18 +145,23 @@ function processImport($import) {
 			'filterLogic' => "[mrn]=\"$mrn\""
 		];
 		$recordData = \REDCap::getData($recordDataParams);
+		
+		print_r($recordData);
+		echo("\n");
+		
 		// re-fetching by rid is necessary to capture repeated instances data
 		$foundRecordID = current($recordData)[$eid]['record_id'];
 		$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
 		
 		// echo("<pre>");
 		// echo("recordDataParams:\n");
-		// print_r($recordData);
+		echo("found record ID: " . $foundRecordID . "\n");
+		print_r($recordData);
 		// echo("\$rid: $rid");
 		// echo("\n");
 		// print_r($recordData);
-		// echo("</pre>");
-		// exit();
+		echo("</pre>");
+		exit();
 		
 		// should we ignore?
 		$saveNeeded = true;
@@ -209,6 +216,8 @@ function processImport($import) {
 		$rid++;
 		$line = null;
 	}
+	
+	echo("</pre>");
 	
 	# if all PDC entries ignored, ignore baseline too
 	// foreach ($data as $rid => $record) {
