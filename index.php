@@ -18,18 +18,16 @@ require_once RC_CONNECT_PATH;
 include_once AUTOLOAD_PATH;
 
 $projectRecordList = \Records::getRecordList(PID);
-function getNextRecordID() {
+function getRandomRecordID() {
 	global $projectRecordList;
-	$rid = 1;
 	while (true) {
+		$rid = mt_rand();
 		if(!isset($projectRecordList[$rid])) {
 			$projectRecordList[$rid] = strval($rid);
-			return $projectRecordList[$rid];
+			return $rid;
 		}
-		$rid++;
 	}
 }
-
 file_put_contents('log.txt', "new log\r\n");
 function localLog($txt) {
 	file_put_contents('log.txt', $txt . "\r\n", FILE_APPEND);
@@ -110,7 +108,6 @@ function processImport($import) {
 	$imported = [];
 	$lines = [];
 	
-	$rid = 1;
 	foreach(preg_split("/((\r?\n)|(\r\n?))/", $import) as $line) {
 		// convert line string to csv array
 		$lines[] = str_getcsv($line);
@@ -124,7 +121,6 @@ function processImport($import) {
 		
 		// add pdc measurement information to baseline info $line
 		if (is_numeric($line[1])) {
-			$mode = 'baseline';
 			$nextLine = $lines[$lineIndex+1];
 			for ($i = 0; $i <= 21; $i++) {
 				if ($line[$i] == null) $line[$i] = $lines[$lineIndex+1][$i];
@@ -148,35 +144,30 @@ function processImport($import) {
 		$recordData = \REDCap::getData($recordDataParams);
 		
 		if (empty($recordData)) {
-			localLog("No record data found for MRN: $mrn");
+			$rid = getRandomRecordID();
+			localLog("No record data found for MRN: $mrn, generated Record ID: $rid");
 		} else {
-			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
-		}
-		
-		// re-fetching by rid is necessary to capture repeated instances data
-		$foundRecordID = array_keys($recordData)[0];
-		
-		if (isset($foundRecordID)) {
-			$recordData = \REDCap::getData($pid, 'array', $foundRecordID);
+			$rid = array_keys($recordData)[0];
+			localLog("Record data was found for MRN: $mrn, found Record ID: $rid");
 		}
 		
 		// should we ignore?
 		$saveNeeded = true;
+		
 		if (!empty($recordData)) {
-			localLog("Found record data for record ID: $foundRecordID -- MRN: $mrn");
-			// echo("record data found for RID: $foundRecordID\r\n");
+			// re-fetching by rid is necessary to capture repeated instances data
+			$recordData = \REDCap::getData($pid, 'array', $rid);
+			
 			// if already randomized, or newer data present, don't save
 			// see if randomized by checking baseline.confirm and baseline.randomization_complete
-			$record = $recordData[$foundRecordID];
-			
-			if ($record[$eid]["confirm"] == 1 && $record[$eid]["randomization_complete"] == 2) {
+			if ($recordData[$rid][$eid]["confirm"] == 1 && $recordData[$rid][$eid]["randomization_complete"] == 2) {
 				localLog("	This patient has been randomized.");
 				$saveNeeded = false;
-				$ignored[$rid] = "-e- Patient randomized already: [confirm] = 1, [randomization_complete] == 2";
+				$ignored[$rid] = "-e- Patient randomized already: [confirm] = 1, [randomization_complete] = 2";
 			}
 			
 			# if last_fill_date > import_data, don't save
-			$existingFillDate = $record["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
+			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
 			if ($existingFillDate >= $line[17]) {
 				localLog("	Last fill date >= import's last fill date.");
 				$saveNeeded = false;
@@ -212,7 +203,6 @@ function processImport($import) {
 				"pdc_measurement_12mths" => $line[21]
 			];
 		}
-		$rid++;
 		$line = null;
 	}
 	
