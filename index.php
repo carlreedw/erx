@@ -167,12 +167,12 @@ function processImport($import) {
 			}
 			
 			# if last_fill_date > import_data, don't save
-			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
-			if ($existingFillDate >= $line[17]) {
-				localLog("	Last fill date >= import's last fill date.");
-				$saveNeeded = false;
-				$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
-			}
+			// $existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
+			// if ($existingFillDate >= $line[17]) {
+				// localLog("	Last fill date >= import's last fill date.");
+				// $saveNeeded = false;
+				// $ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
+			// }
 		}
 		
 		if ($saveNeeded === true) {
