@@ -72,8 +72,8 @@ if ($useLocalImportFile) {
 	foreach($contents as $i => $file) {
 		if($file['path'] == $importFilename){
 			$csv = $filesystem->read($file['path']);
-			// file_put_contents("C:/temp/new_pdc_import.csv", $csv);
-			// exit();
+			file_put_contents("C:/temp/new_pdc_import.csv", $csv);
+			exit();
 		}
 	}
 }
@@ -167,12 +167,12 @@ function processImport($import) {
 			}
 			
 			# if last_fill_date > import_data, don't save
-			$existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
-			if ($existingFillDate >= $line[17]) {
-				localLog("	Last fill date >= import's last fill date.");
-				$saveNeeded = false;
-				$ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
-			}
+			// $existingFillDate = $recordData[$rid]["repeat_instances"][$eid][$line[2]][$line[3]]["last_fill_date"];
+			// if ($existingFillDate >= $line[17]) {
+				// localLog("	Last fill date >= import's last fill date.");
+				// $saveNeeded = false;
+				// $ignored[$rid][$line[3]] = "existing last_fill_date (" . $existingFillDate . ") is >= import last_fill_date (" . $line[17].") for this PDC data";
+			// }
 		}
 		
 		if ($saveNeeded === true) {
