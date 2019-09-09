@@ -72,8 +72,8 @@ if ($useLocalImportFile) {
 	foreach($contents as $i => $file) {
 		if($file['path'] == $importFilename){
 			$csv = $filesystem->read($file['path']);
-			file_put_contents("C:/temp/new_pdc_import.csv", $csv);
-			exit();
+			// file_put_contents("C:/temp/new_pdc_import.csv", $csv);
+			// exit();
 		}
 	}
 }
