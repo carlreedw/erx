@@ -2,7 +2,7 @@
 /*
 	PLUGIN NAME: erx
 	DESCRIPTION: Automatically add/update records in the Adherence Intervention Study project
-	VERSION: 1.0
+	VERSION: 1.0.1
 	AUTHOR: carl.w.reed@vumc.org
 */
 
