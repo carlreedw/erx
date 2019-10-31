@@ -2,15 +2,15 @@
 /*
 	PLUGIN NAME: erx
 	DESCRIPTION: Automatically add/update records in the Adherence Intervention Study project
-	VERSION: 1.0.1
+	VERSION: 2.0.1
 	AUTHOR: carl.w.reed@vumc.org
 */
 
 $profiling = time();
 
 # includes
-if (file_exists("base.php")) {
-	require_once "base.php";
+if (file_exists("../base.php")) {
+	require_once "../base.php";
 } else {
 	require_once "/app001/www/redcap/plugins/erx/base.php";
 }
@@ -19,7 +19,7 @@ include_once AUTOLOAD_PATH;
 
 file_put_contents("log.txt", "logging:\n");
 function _log($text) {
-	file_put_contents("log.txt", $text . "\n", FILE_APPEND);	
+	file_put_contents("log.txt", "logging:\n", FILE_APPEND);	
 }
 
 $projectRecordList = \Records::getRecordList(PID);
@@ -34,10 +34,10 @@ function getRandomRecordID() {
 	}
 }
 
-// $useLocalImportFile = true;
+$useLocalImportFile = true;
 if ($useLocalImportFile) {
 	// for quicker testing on dev:
-	$filepath = "C:/vumc/plugins/erx/new_pdc_import 4-16.csv";
+	$filepath = "import_file_10_31.csv";
 	$csv = file_get_contents($filepath);
 	
 	_log("Pulling test import from filepath: $filepath");
@@ -79,6 +79,8 @@ if ($useLocalImportFile) {
 	}
 }
 
+// echo("<pre>");
+
 // process import file contents
 processImport($csv);
 
@@ -98,6 +100,16 @@ function processImport($import) {
 	# for diagnostics
 	// exit("<pre>" . print_r(\REDCap::getData(PID), true) . "</pre>");
 	
+	# $fields is a [field_name] => column_number table
+	$fields = [];
+	
+	# $field_labels is a [field_label] => $field_name table
+	// $field_labels = [];
+	// foreach ($project->metadata as $field_name => $info) {
+		// $field_labels[$info['element_label']] = $field_name;
+	// }
+	// exit("<pre>" . print_r($field_labels, true) . "</pre>");
+	
 	# $data is what we will send to redcap database
 	$data = [];
 	
@@ -112,13 +124,19 @@ function processImport($import) {
 		// convert line string to csv array
 		$lines[] = str_getcsv($line);
 	}
-	
 	foreach($lines as $lineIndex => $line) {
 		# for quicker dev testing, only process first n rows
 		// if ($lineIndex == 16) break;
 		
 		// skip header row
-		if ($lineIndex == 0) continue;
+		if ($lineIndex == 0) {
+			foreach($line as $column_index => $field_name) {
+				$fields[$field_name] = $column_index;
+			}
+			continue;
+		}
+		// exit("<pre>" . count($fields) . " " . count($field_labels) . " " . count($project->metadata) . "</pre>");
+		exit("<pre>" . print_r($fields, true) . "</pre>");
 		
 		// add pdc measurement information to baseline info $line
 		if (is_numeric($line[1])) {
