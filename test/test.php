@@ -205,21 +205,21 @@ $pdc_fields = [
 	"pdc_measurement_12mths"
 ];
 
-// // // reset test record data
-// // $test_records = json_decode(file_get_contents("test_records.json"), true);
-// // _log(count($test_records) . " test records created from test_records.json.");
+// // reset test record data
+// $test_records = json_decode(file_get_contents("test_records.json"), true);
+// _log(count($test_records) . " test records created from test_records.json.");
 
-// // $save_results = \REDCap::saveData(PID, 'array', $test_records, 'overwrite');
-// // _log("Saving test records to REDCap...\n");
-// // if (!empty($save_results['errors'])) {
-	// // _log("save_results:\n" . print_r($save_results, true));
-	// // _log("Errors occured while saving, aborting import.");
-	// // exit("<pre>" . file_get_contents("log.txt") . "</pre>");
-// // }
-// // _log("Save successful.");
+// $save_results = \REDCap::saveData(PID, 'array', $test_records, 'overwrite');
+// _log("Saving test records to REDCap...\n");
+// if (!empty($save_results['errors'])) {
+	// _log("save_results:\n" . print_r($save_results, true));
+	// _log("Errors occured while saving, aborting import.");
+	// exit("<pre>" . file_get_contents("log.txt") . "</pre>");
+// }
+// _log("Save successful.");
 
-$import_filepath = "C:/vumc/projects/erx/pdc_import_11_13.csv";
-// $import_filepath = "mock_import.csv";
+// $import_filepath = "C:/vumc/projects/erx/pdc_import_11_13.csv";
+$import_filepath = "mock_import.csv";
 _log("Fetching import file contents from path: $import_filepath");
 $import_file_contents = file_get_contents($import_filepath);
 
@@ -312,7 +312,7 @@ foreach($import_rows as $row_index => $row) {
 			$today_date = date("Y-m-d");
 			$diff_in_days = round((strtotime($today_date) - strtotime($assess_date))/60/60/24);
 			_log("days: " . $diff_in_days);
-			if ($diff_in_days < 90) {
+			if ($diff_in_days < 30) {
 				_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient's expected non-adherence date was less than 30 days ago ([expnon_assessdate] = $assess_date).");
 				continue;
 			}
