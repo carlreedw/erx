@@ -44,14 +44,7 @@ foreach($records as $rid => $record) {
 $saved = \REDCap::saveData(
 	PID,
 	'array',
-	$records,
-	null,
-	null,
-	null,
-	null,
-	null,
-	null,
-	false
+	$records
 );
 echo(print_r($saved, true));
 echo("</pre>");
