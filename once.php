@@ -46,6 +46,6 @@ $params = [
 	"data" => $records,
 	"commitData" => false
 ];
-$saved = \REDCap::saveData(PID, 'array', [$records[1]], 'overwrite');
+$saved = \REDCap::saveData($params);
 echo(print_r($saved, true));
 echo("</pre>");
