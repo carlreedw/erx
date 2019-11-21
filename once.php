@@ -2,9 +2,11 @@
 require "base.php";
 require RC_CONNECT_PATH;
 
-file_put_contents("C:/vumc/log.txt", "logging:\n");
+// file_put_contents("C:/vumc/log.txt", "logging:\n");
+echo("<pre>");
 function _log($text) {
-	file_put_contents("C:/vumc/log.txt", $text . "\n", FILE_APPEND);	
+	// file_put_contents("C:/vumc/log.txt", $text . "\n", FILE_APPEND);	
+	echo("$text\n");
 }
 
 $params = [
@@ -15,7 +17,7 @@ $records = \REDCap::getData($params);
 $project = new \Project(PID);
 $eid = $project->firstEventId;
 
-_log("records:\n" . print_r($records, true));
+// _log("records:\n" . print_r($records, true));
 
 foreach($records as $rid => $record) {
 	$import_date = null;
@@ -26,7 +28,7 @@ foreach($records as $rid => $record) {
 		foreach($instances as $instance) {
 			if (!empty($instance['import_date'])) {
 				$import_date = $instance['import_date'];
-				echo ("import date found for record[$rid]:<br>$import_date<br>");
+				_log("import date found for record[$rid]: $import_date");
 				break;
 			}
 		}
@@ -42,8 +44,8 @@ foreach($records as $rid => $record) {
 $params = [
 	"project_id" => PID,
 	"data" => $records,
-	"overwriteBehavior" => 'overwrite',
 	"commitData" => false
 ];
 $saved = \REDCap::saveData(PID, 'array', [$records[1]], 'overwrite');
 echo(print_r($saved, true));
+echo("</pre>");
