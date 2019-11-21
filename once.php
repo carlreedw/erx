@@ -9,6 +9,14 @@ function _log($text) {
 	echo("$text\n");
 }
 
+function var_dump_b($var) {
+	ob_start();
+	var_dump($var);
+	$t = ob_flush();
+	ob_end_clean();
+	return $t;
+}
+
 $params = [
 	"project_id" => PID,
 	"fields" => ["record_id", "non_adherence", "import_date", "importdatecopy1", "expnon_assessdate"]
@@ -22,8 +30,9 @@ $eid = $project->firstEventId;
 foreach($records as $rid => $record) {
 	$import_date = null;
 	$instances = &$records[$rid]['repeat_instances'][$eid]['pdc_measurement'];
-	
-	if ($record[$eid]['non_adherence'] !== null) {
+	$non_adherence = $record[$eid]['non_adherence'];
+	_log("non adherence value for rid: $rid -- " . var_dump_b($non_adherence));
+	if ($non_adherence !== "") {
 		// get [import_date] value
 		foreach($instances as $instance) {
 			if (!empty($instance['import_date'])) {
