@@ -23,7 +23,7 @@ foreach($records as $rid => $record) {
 	$import_date = null;
 	$instances = &$records[$rid]['repeat_instances'][$eid]['pdc_measurement'];
 	
-	if (!empty($record[$eid]['non_adherence'])) {
+	if ($record[$eid]['non_adherence'] !== null) {
 		// get [import_date] value
 		foreach($instances as $instance) {
 			if (!empty($instance['import_date'])) {
