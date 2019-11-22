@@ -52,7 +52,7 @@ function importNewPatient(&$row) {
 	
 	$rid = getRandomRecordID();
 	$mrn = $row[$columns['mrn']];
-	_log("Importing new patient (MRN: $mrn) from row pair (row $row_index - " . ($row_index+1) . ") to record ID: $rid...");
+	// _log("Importing new patient (MRN: $mrn) / RID:$rid from row pair (row " . ($row_index+1) . " - " . ($row_index+2) . ") to record ID: $rid...");
 	
 	
 	// build array data for saveData
@@ -93,9 +93,9 @@ function importNewPatient(&$row) {
 	// execute save
 	$results = \REDCap::saveData(PID, 'array', $data);
 	if (!empty($results['errors'])) {
-		_log("New patient import failed. See saveData results below:\n" . print_r($results, true));
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: IMPORT NEW PATIENT FAILED -- ERX plugin couldn't add a new record for this data because REDCap failed to save the data, see errors below:\n" . print_r($results, true));
 	} else {
-		_log("New patient import succeeded. Saved new patient data to Record ID: $rid");
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: IMPORT NEW PATIENT SUCCESS");
 	}
 }
 function addPdcInstance(&$row, &$record) {
@@ -105,10 +105,12 @@ function addPdcInstance(&$row, &$record) {
 	global $pdc_fields;
 	global $row_index;
 	global $new_inst_count;
+	global $rp1;
+	global $rp2;
 	
 	$mrn = $row[$columns['mrn']];
 	if (empty($record[$rid]["repeat_instances"][$eid]["pdc_measurement"])) {
-		_log("Failed to add PDC Measurement instance for patient (MRN: $mrn) from row pair (row $row_index - " . ($row_index+1) . ") -- mal-formed record -- no existing PDC Measurement instances.");
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: ADD PDC INSTANCE FAILED -- ERX plugin couldn't add a PDC instance because it couldn't find existing PDC Measurement instances.");
 		return;
 	}
 	
@@ -143,7 +145,7 @@ function addPdcInstance(&$row, &$record) {
 		}
 	}
 	if ($exact_match === true) {
-		_log("Failed to add PDC Measurement instance for patient (MRN: $mrn) from row pair (row $row_index - " . ($row_index+1) . ") -- import data matches last PDC measurement instance exactly.");
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: ADD PDC INSTANCE FAILED -- ERX plugin didn't import this data because it is an exact match of the last PDC Measurement instance for this patient record.");
 		return;
 	}
 	
@@ -172,10 +174,10 @@ function addPdcInstance(&$row, &$record) {
 	// execute save
 	$results = \REDCap::saveData(PID, 'array', $data);
 	if (!empty($results['errors'])) {
-		_log("New PDC import from row pair (row $row_index - " . ($row_index+1) . ") failed. See saveData results below:\n" . print_r($results, true));
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: ADD PDC INSTANCE FAILED -- ERX plugin couldn't add a PDC instance because REDCap failed to save the data, see errors below:\n" . print_r($results, true));
 	} else {
 		$new_inst_count++;
-		_log("New PDC import from row pair (row $row_index - " . ($row_index+1) . ") succeeded. Saved new PDC instance ($instance_id) in Record ID: $rid");
+		_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: ADD PDC INSTANCE SUCCESS.");
 	}
 }
 function copyImportDates() {
@@ -216,7 +218,7 @@ function copyImportDates() {
 	_log("\\REDCap::saveData results:\n" . print_r($saved, true));
 }
 function getImportData() {
-	return file_get_contents("C:/root/vumc/projects/erx/pdc import 10-31.csv");
+	return file_get_contents("C:/vumc/projects/erx/import 11-22.csv");
 	/*
 	----
 	fetch import file from other server
@@ -248,6 +250,8 @@ function getImportData() {
 	foreach($contents as $i => $file) {
 		if($file['path'] == $importFilename){
 			$csv = $filesystem->read($file['path']);
+			// file_put_contents("C:/vumc/projects/erx/import 11-22.csv", $csv);
+			// exit();
 			return $csv;
 		}
 	}
@@ -310,28 +314,31 @@ $columns = [];
 $new_inst_count = 0;
 _log("Processing import by line...");
 foreach($import_rows as $row_index => $row) {
+	$rp1 = $row_index + 1;
+	$rp2 = $rp1++;
 	if ($row_index === 0) {
 		// handle header
 		foreach($row as $column_index => $field_name) {
 			$columns[$field_name] = $column_index;
 		}
-		_log("Generated columns array: " . print_r($columns, true));
+		// _log("Generated columns array: " . print_r($columns, true));
 	}
 	
-	$mrn = $row[$columns['mrn']];
-	if ($mrn > 0) {
+	$mrn = null;
+	$mrngpi = null;
+	$rid = null;
+	$mrn = (int) $row[$columns['mrn']];
+	if (!empty($mrn) and $mrn > 0) {
 		// this is a top row, copy next row information into this row
 		foreach($row as $index => $value) {
 			if ($value !== 0 and empty($value)) {
 				$row[$index] = $import_rows[$row_index+1][$index];
 			}
 		}
-		
-		// $row now contains all relevant imported baseline and pdc information
-		// _log("\$row: " . print_r($row, true) . "\n");
+		$mrngpi = $row[$columns['mrn_gpi']];
 		
 		// fetch record id by MRN from db
-		$query = db_query("SELECT * FROM redcap_data WHERE project_id=" . PID . " AND field_name='mrn' AND value=$mrn");
+		$query = db_query("SELECT * FROM redcap_data WHERE project_id=" . PID . " AND field_name='mrn_gpi' AND value='$mrngpi'");
 		while ($db_row = db_fetch_assoc($query)) {
 			$rid = (int) $db_row['record'];
 		}
@@ -346,66 +353,65 @@ foreach($import_rows as $row_index => $row) {
 		$record = \REDCap::getData(PID, 'array', $rid);
 		$baseline = &$record[$rid][$eid];
 		if ((int) $baseline['record_id'] !== $rid) {
-			_log("Ignoring an import row pair (row $row_index - " . $row_index+1 . ") for MRN:$mrn since baseline data found is not as expected (no matching record_id field).");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- Baseline data found is not as expected (no matching record_id field).");
 			continue;
 		}
 		
 		// check business logic!
 		$randomization_label = getLabel('treat', $baseline['treat']);
 		if ($randomization_label == "Group A" or $randomization_label == "Group B") {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient has been randomized into $randomization_label");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient has been randomized into $randomization_label.");
 			continue;
 		}
 		
 		// find most recent PDC measurement instance
 		if (!isset($record[$rid]["repeat_instances"][$eid]["pdc_measurement"])) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since the ERX plugin could find no PDC Measurement instances.");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- ERX plugin could find no PDC Measurement instances");
 			continue;
 		}
 		$instance_id = max(array_keys($record[$rid]["repeat_instances"][$eid]["pdc_measurement"]));
 		$pdc_instance = $record[$rid]["repeat_instances"][$eid]["pdc_measurement"][$instance_id];
 		
 		if (!empty($pdc_instance['deceased'])) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient is deceased.");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient is deceased.");
 			continue;
 		}
 		if ($pdc_instance["pdc_measurement_4mths"] >= 90) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient's [pdc_measurement_4mths] value is >= 90.");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's last PDC measurement had a [pdc_measurement_4mths] value >= 90.");
 			continue;
 		}
 		if (!empty($pdc_instance["ibd_clinic"])) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this is an IBD patient.");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This is an IBD patient.");
 			continue;
 		}
 		if (!empty($pdc_instance["vumc_employee"])) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient is a VUMC employee.");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient is a VUMC employee.");
 			continue;
 		}
 		$assess_date = $baseline['expnon_assessdate'];
 		if (!empty($assess_date)) {
 			$today_date = date("Y-m-d");
 			$diff_in_days = round((strtotime($today_date) - strtotime($assess_date))/60/60/24);
-			// _log("days: " . $diff_in_days);
 			if ($diff_in_days < 30) {
-				_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient's expected non-adherence date was less than 30 days ago ([expnon_assessdate] = $assess_date).");
+				_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's expected non-adherence date was less than 30 days ago ([expnon_assessdate] = $assess_date).");
 				continue;
 			}
 		}
 		if ($baseline["clinical"] == 7) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient's [clinical] != 7, expected non-adherence due to MD supervision");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's [clinical] != 7, expected non-adherence due to MD supervision.");
 			continue;
 		}
 		
 		if ($baseline["non_adherence"] == 1 and ($baseline["non_adherence_yes"][3] or $baseline["non_adherence_yes"][4])) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient has been discontinued (or there is an incongruency of claims).");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient has been discontinued (or there is an incongruency of claims).");
 			continue;
 		}
 		if (!empty($pdc_instance['gap_days']) and $pdc_instance["gap_days"] < 5) {
-			_log("Ignoring an import row pair (row $row_index - " . ($row_index+1) . ") for MRN:$mrn since this patient has less than 5 gap days ([gap_days]=" . $pdc_instance["gap_days"] . ")");
+			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient has less than 5 gap days ([gap_days]=" . $pdc_instance["gap_days"] . ")");
 			continue;
 		}
 		
-		_log("Adding PDC Measurement instance from row pair (row $row_index - " . ($row_index+1) . ") for patient MRN:$mrn with record ID: $rid...");
+		// _log("Adding PDC Measurement instance from row pair (row " . ($row_index+1) . " - " . ($row_index+2) . ") for patient MRN:$mrn / RID:$rid");
 		addPdcInstance($row, $record);
 	}
 }
