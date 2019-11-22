@@ -181,7 +181,7 @@ function addPdcInstance(&$row, &$record) {
 	}
 }
 function copyImportDates() {
-	_log("copying [import_date] to [importdatecopy1] for all records:");
+	_log("\nNow copying [import_date] to [importdatecopy1] for all records:");
 	global $project;
 	global $eid;
 	unset($params);
@@ -196,26 +196,34 @@ function copyImportDates() {
 	foreach($records as $rid => $record) {
 		$import_date = null;
 		$instances = &$records[$rid]['repeat_instances'][$eid]['pdc_measurement'];
-		
-		if (!empty($record[$eid]['non_adherence'])) {
+		$non_adherence = $record[$eid]['non_adherence'];
+		if ($non_adherence !== "") {
 			// get [import_date] value
 			foreach($instances as $instance) {
 				if (!empty($instance['import_date'])) {
 					$import_date = $instance['import_date'];
-					_log("[import_date] found for record[$rid]: $import_date");
 					break;
 				}
 			}
 			
 			// copy to [importdatecopy1]
 			if (!empty($import_date)) {
+				_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, [import_date] copied to [importdatecopy1]");
 				$records[$rid][$eid]['importdatecopy1'] = $import_date;
+			} else {
+				_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, but [import_date] is blank.");
 			}
+		} else {
+			_log("RECORD #$rid had a blank [non_adherence] value, [import_date] not copied.");
 		}
 	}
 	
 	$saved = \REDCap::saveData(PID, 'array', $records);
-	_log("\\REDCap::saveData results:\n" . print_r($saved, true));
+	if (empty($saved['errors'])) {
+		_log("Saved [importdatecopy1] changes successfully.");
+	} else {
+		_log("There were errors saving changes to [importdatecopy1]:\n" . print_r($saved, true));
+	}
 }
 function getImportData() {
 	return file_get_contents("C:/vumc/projects/erx/import 11-22.csv");
@@ -315,7 +323,7 @@ $new_inst_count = 0;
 _log("Processing import by line...");
 foreach($import_rows as $row_index => $row) {
 	$rp1 = $row_index + 1;
-	$rp2 = $rp1++;
+	$rp2 = $rp1 + 1;
 	if ($row_index === 0) {
 		// handle header
 		foreach($row as $column_index => $field_name) {
@@ -419,5 +427,5 @@ foreach($import_rows as $row_index => $row) {
 _log('New instance count: ' . $new_inst_count);
 _log("Import successful.");
 
-// copyImportDates();
+copyImportDates();
 echo("</pre>");

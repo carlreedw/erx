@@ -28,19 +28,20 @@ foreach($records as $rid => $record) {
 		foreach($instances as $instance) {
 			if (!empty($instance['import_date'])) {
 				$import_date = $instance['import_date'];
-				_log("import date found for record[$rid]: $import_date");
 				break;
 			}
 		}
 		
 		// copy to [importdatecopy1]
 		if (!empty($import_date)) {
-			_log("Non-Adherence Study record #$rid had [non_adherence] raw value == $non_adherence, [import_date] copied to [importdatecopy1] and [expnon_assessdate].");
+			_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, [import_date] copied to [importdatecopy1] and [expnon_assessdate].");
 			$records[$rid][$eid]['importdatecopy1'] = $import_date;
 			$records[$rid][$eid]['expnon_assessdate'] = $import_date;
+		} else {
+			_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, but [import_date] is blank.");
 		}
 	} else {
-		_log("Non-Adherence Study record #$rid had a blank [non_adherence] value, [import_date] not copied.");
+		_log("RECORD #$rid had a blank [non_adherence] value, [import_date] not copied.");
 	}
 }
 
