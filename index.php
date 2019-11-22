@@ -49,6 +49,8 @@ function importNewPatient(&$row) {
 	global $baseline_fields;
 	global $pdc_fields;
 	global $row_index;
+	global $rp1;
+	global $rp2;
 	
 	$rid = getRandomRecordID();
 	$mrn = $row[$columns['mrn']];
