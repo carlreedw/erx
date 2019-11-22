@@ -22,22 +22,26 @@ $eid = $project->firstEventId;
 foreach($records as $rid => $record) {
 	$import_date = null;
 	$instances = &$records[$rid]['repeat_instances'][$eid]['pdc_measurement'];
-	
-	if ($record[$eid]['non_adherence'] !== null) {
+	$non_adherence = $record[$eid]['non_adherence'];
+	if ($non_adherence !== "") {
 		// get [import_date] value
 		foreach($instances as $instance) {
 			if (!empty($instance['import_date'])) {
 				$import_date = $instance['import_date'];
-				_log("import date found for record[$rid]: $import_date");
 				break;
 			}
 		}
 		
 		// copy to [importdatecopy1]
 		if (!empty($import_date)) {
+			_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, [import_date] copied to [importdatecopy1] and [expnon_assessdate].");
 			$records[$rid][$eid]['importdatecopy1'] = $import_date;
 			$records[$rid][$eid]['expnon_assessdate'] = $import_date;
+		} else {
+			_log("RECORD #$rid had [non_adherence] raw value == $non_adherence, but [import_date] is blank.");
 		}
+	} else {
+		_log("RECORD #$rid had a blank [non_adherence] value, [import_date] not copied.");
 	}
 }
 
@@ -46,5 +50,7 @@ $saved = \REDCap::saveData(
 	'array',
 	$records
 );
-echo(print_r($saved, true));
+if (!empty($saved['errors'])) {
+	_log(print_r($saved, true));
+}
 echo("</pre>");
