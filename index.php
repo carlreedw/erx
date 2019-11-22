@@ -226,7 +226,7 @@ function copyImportDates() {
 	}
 }
 function getImportData() {
-	return file_get_contents("C:/vumc/projects/erx/import 11-22.csv");
+	// return file_get_contents("C:/vumc/projects/erx/import 11-22.csv");
 	/*
 	----
 	fetch import file from other server
