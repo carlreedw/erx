@@ -9,14 +9,6 @@ function _log($text) {
 	echo("$text\n");
 }
 
-function var_dump_b($var) {
-	ob_start();
-	var_dump($var);
-	$t = ob_flush();
-	ob_end_clean();
-	return $t;
-}
-
 $params = [
 	"project_id" => PID,
 	"fields" => ["record_id", "non_adherence", "import_date", "importdatecopy1", "expnon_assessdate"]
@@ -31,7 +23,6 @@ foreach($records as $rid => $record) {
 	$import_date = null;
 	$instances = &$records[$rid]['repeat_instances'][$eid]['pdc_measurement'];
 	$non_adherence = $record[$eid]['non_adherence'];
-	_log("non adherence value for rid: $rid -- " . var_dump_b($non_adherence));
 	if ($non_adherence !== "") {
 		// get [import_date] value
 		foreach($instances as $instance) {
@@ -44,9 +35,12 @@ foreach($records as $rid => $record) {
 		
 		// copy to [importdatecopy1]
 		if (!empty($import_date)) {
+			_log("Non-Adherence Study record #$rid had [non_adherence] raw value == $non_adherence, [import_date] copied to [importdatecopy1] and [expnon_assessdate].");
 			$records[$rid][$eid]['importdatecopy1'] = $import_date;
 			$records[$rid][$eid]['expnon_assessdate'] = $import_date;
 		}
+	} else {
+		_log("Non-Adherence Study record #$rid had a blank [non_adherence] value, [import_date] not copied.");
 	}
 }
 
@@ -55,5 +49,7 @@ $saved = \REDCap::saveData(
 	'array',
 	$records
 );
-echo(print_r($saved, true));
+if (!empty($saved['errors'])) {
+	_log(print_r($saved, true));
+}
 echo("</pre>");
