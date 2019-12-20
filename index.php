@@ -322,6 +322,9 @@ _log("Collected " . count($import_rows) . " rows from $import_filepath\n");
 // Columns array will hold [field name] => column number (of import file)
 $columns = [];
 $new_inst_count = 0;
+$instances_90days = 0;
+$instances_30days = 0;
+$instances_no_date = 0;
 _log("Processing import by line...");
 foreach($import_rows as $row_index => $row) {
 	$rp1 = $row_index + 1;
@@ -398,15 +401,6 @@ foreach($import_rows as $row_index => $row) {
 			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient is a VUMC employee.");
 			continue;
 		}
-		$assess_date = $baseline['expnon_assessdate'];
-		if (!empty($assess_date)) {
-			$today_date = date("Y-m-d");
-			$diff_in_days = round((strtotime($today_date) - strtotime($assess_date))/60/60/24);
-			if ($diff_in_days < 30) {
-				_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's expected non-adherence date was less than 30 days ago ([expnon_assessdate] = $assess_date).");
-				continue;
-			}
-		}
 		if ($baseline["clinical"] == 7) {
 			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's [clinical] != 7, expected non-adherence due to MD supervision.");
 			continue;
@@ -420,13 +414,33 @@ foreach($import_rows as $row_index => $row) {
 			_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient has less than 5 gap days ([gap_days]=" . $pdc_instance["gap_days"] . ")");
 			continue;
 		}
+		$assess_date = $baseline['expnon_assessdate'];
+		if (!empty($assess_date)) {
+			$today_date = date("Y-m-d");
+			$diff_in_days = round((strtotime($today_date) - strtotime($assess_date))/60/60/24);
+			if ($diff_in_days >= 90) {
+				$instances_90days++;
+			}
+			if ($diff_in_days >= 30) {
+				$instances_30days++;
+			}
+			if ($diff_in_days < 30) {
+				_log("ROWS:[$rp1 - $rp2] / MRN:$mrn / RID:$rid / ACTION: Ignore -- This patient's expected non-adherence date was less than 30 days ago ([expnon_assessdate] = $assess_date).");
+				continue;
+			}
+		} else {
+			$instances_no_date++;
+		}
 		
 		// _log("Adding PDC Measurement instance from row pair (row " . ($row_index+1) . " - " . ($row_index+2) . ") for patient MRN:$mrn / RID:$rid");
 		addPdcInstance($row, $record);
 	}
 }
 
-_log('New instance count: ' . $new_inst_count);
+_log('30 day instance count: ' . $instances_30days);
+_log('90 day instance count: ' . $instances_90days);
+_log('no expnon_assessdate instance count: ' . $instances_no_date);
+_log('new instance count: ' . $new_inst_count);
 _log("Import successful.");
 
 copyImportDates();
