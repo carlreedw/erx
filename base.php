@@ -1,23 +1,22 @@
 <?php
 if(!defined("ENVIRONMENT")) {
-	if (is_file('/app001/victrcore/lib/Victr/Env.php')) include_once('/app001/victrcore/lib/Victr/Env.php');
-	if (class_exists("Victr_Env")) {
-		$envConf = Victr_Env::getEnvConf();
+	include_once(dirname(__DIR__)."/Core/bootstrap.php");
+    $GLOBALS["Core"]->getEnvironment();
 
-		if ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_PROD) {
-			define("ENVIRONMENT", "PROD");
-			define("PID", 96070);
-			// define("PID", 77551);
-			// define("PID", 92938);	// test project on prod");
-		} elseif ($envConf[Victr_Env::ENV_CURRENT] === Victr_Env::ENV_DEV) {
-			define("ENVIRONMENT", "TEST");
-			define("PID", 1307);
-		}
-		define("CREDENTIALS_PATH", "/app001/credentials/adherence.txt");
-		define("RC_CONNECT_PATH", "/app001/www/redcap/redcap_connect.php");
-		define("AUTOLOAD_PATH", "/app001/www/redcap/plugins/erx/vendor/autoload.php");
-	} else {
-		define("ENVIRONMENT", "DEV");
+    if (ENVIRONMENT == "PROD") {
+		define("PID", 96070);
+		// define("PID", 77551);
+		// define("PID", 92938);	// test project on prod");
+	    define("CREDENTIALS_PATH", "/app001/credentials/adherence.txt");
+	    define("RC_CONNECT_PATH", "/app001/www/redcap/redcap_connect.php");
+	    define("AUTOLOAD_PATH", "/app001/www/redcap/plugins/erx/vendor/autoload.php");
+	} elseif (ENVIRONMENT == "TEST") {
+		define("PID", 1307);
+	    define("CREDENTIALS_PATH", "/app001/credentials/adherence.txt");
+	    define("RC_CONNECT_PATH", "/app001/www/redcap/redcap_connect.php");
+	    define("AUTOLOAD_PATH", "/app001/www/redcap/plugins/erx/vendor/autoload.php");
+	}
+	else {
 		// define("PID", 32);	// @able
 		define("CREDENTIALS_PATH", "C:\\xampp\\credentials\\adherence.txt");
 		define("RC_CONNECT_PATH", "C:\\xampp\\htdocs\\redcap\\redcap_connect.php");
